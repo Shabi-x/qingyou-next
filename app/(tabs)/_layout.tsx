@@ -60,7 +60,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <IconSymbol 
               size={26} 
-              name="calendar.badge.clock" 
+              name="note.text" 
               color={focused ? iconSelectedColor : iconDefaultColor} 
             />
           ),
@@ -74,7 +74,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <IconSymbol 
               size={26} 
-              name="list.bullet.clipboard" 
+              name="calendar" 
               color={focused ? iconSelectedColor : iconDefaultColor} 
             />
           ),

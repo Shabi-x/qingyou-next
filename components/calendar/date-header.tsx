@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export function DateHeader() {
-  const secondaryColor = useThemeColor({}, 'icon');
+  const secondaryColor = useThemeColor({}, 'textSecondary');
   const { t } = useI18n('calendar');
   
   // 组件挂载时从操作系统获取当前日期

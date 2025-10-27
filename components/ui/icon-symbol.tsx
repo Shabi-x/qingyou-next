@@ -18,10 +18,13 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
-  'calendar.badge.clock': 'event',
+  // Tab bar icons matching design
+  'note.text': 'description',          // Calendar tab - note/doc icon
+  'calendar': 'calendar-today',         // Schedule tab - simple calendar
+  'calendar.badge.clock': 'event',      // Alternative calendar
   'list.bullet.clipboard': 'assignment',
-  'alarm.fill': 'alarm',
-  'person.crop.circle': 'account-circle',
+  'alarm.fill': 'alarm',                // Clock tab
+  'person.crop.circle': 'account-circle', // Mine tab
 } as IconMapping;
 
 /**
