@@ -1,4 +1,4 @@
-// Fallback for using MaterialIcons on web.
+// Android-specific implementation using MaterialIcons
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
@@ -6,12 +6,9 @@ import { ComponentProps } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 
 type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
-type IconSymbolName = keyof typeof MAPPING;
 
 /**
  * Add your SF Symbols to Material Icons mappings here.
- * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
- * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
 const MAPPING = {
   'house.fill': 'home',
@@ -27,8 +24,10 @@ const MAPPING = {
   'person.crop.circle': 'account-circle',
 } as IconMapping;
 
+type IconSymbolName = keyof typeof MAPPING;
+
 /**
- * An icon component that uses MaterialIcons on web, matching iOS/Android interface.
+ * Android implementation using MaterialIcons wrapped in a View to match iOS interface
  */
 export function IconSymbol({
   name,
@@ -52,3 +51,4 @@ export function IconSymbol({
     </View>
   );
 }
+
