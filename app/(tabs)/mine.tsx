@@ -1,6 +1,5 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { ThemeDebugButton } from '@/components/theme-debug-button';
+import { ThemedText, ThemedView } from '@/components/common';
+import { ThemeDebugButton } from '@/components/theme';
 import { StyleSheet } from 'react-native';
 
 export default function MineScreen() {

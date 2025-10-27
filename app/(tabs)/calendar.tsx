@@ -1,14 +1,14 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { DateHeader } from '@/components/calendar';
+import { ThemedText, ThemedView } from '@/components/common';
 import { StyleSheet } from 'react-native';
 
 export default function CalendarScreen() {
   return (
     <ThemedView style={styles.container}>
+      <DateHeader />
       <ThemedView style={styles.content}>
-        <ThemedText type="title">日历</ThemedText>
         <ThemedText style={styles.description}>
-          Hello World - 日历页面
+          日历内容区域
         </ThemedText>
       </ThemedView>
     </ThemedView>
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     lineHeight: 24,
+    opacity: 0.5,
   },
 });
 

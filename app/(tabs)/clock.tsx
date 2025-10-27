@@ -1,5 +1,4 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { ThemedText, ThemedView } from '@/components/common';
 import { StyleSheet } from 'react-native';
 
 export default function ClockScreen() {
