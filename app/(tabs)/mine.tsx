@@ -1,19 +1,21 @@
-import { HelloWave } from '@/components/hello-wave';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ThemeDebugButton } from '@/components/theme-debug-button';
 import { StyleSheet } from 'react-native';
 
-export default function HomeScreen() {
+export default function MineScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.content}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">欢迎回来！</ThemedText>
-          <HelloWave />
-        </ThemedView>
+        <ThemedText type="title">我的</ThemedText>
         <ThemedText style={styles.description}>
-          这是首页内容区域
+          这是个人中心页面
         </ThemedText>
+        
+        <ThemedView style={styles.debugSection}>
+          <ThemedText style={styles.sectionTitle}>开发调试</ThemedText>
+          <ThemeDebugButton />
+        </ThemedView>
       </ThemedView>
     </ThemedView>
   );
@@ -28,13 +30,18 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 16,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   description: {
     fontSize: 16,
     lineHeight: 24,
   },
+  debugSection: {
+    marginTop: 32,
+    gap: 12,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    opacity: 0.7,
+  },
 });
+
