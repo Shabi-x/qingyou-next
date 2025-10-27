@@ -1,16 +1,20 @@
 import { ThemedText } from '@/components/common';
+import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export function DateHeader() {
   const secondaryColor = useThemeColor({}, 'icon');
+  const { t } = useI18n('calendar');
+  
   // 组件挂载时从操作系统获取当前日期
   const [currentDate] = useState(() => new Date());
 
   // 获取星期
-  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-  const weekday = weekdays[currentDate.getDay()];
+  const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+  const weekdayKey = weekdayKeys[currentDate.getDay()];
+  const weekday = t(`weekdays.${weekdayKey}` as any);
 
   // 获取年月日
   const year = currentDate.getFullYear();
@@ -28,7 +32,7 @@ export function DateHeader() {
           {year}
         </ThemedText>
         <ThemedText style={[styles.dateTextDay, { color: secondaryColor }]}>
-          {month}月{day}日
+          {t('month_day', { month, day })}
         </ThemedText>
       </View>
     </View>

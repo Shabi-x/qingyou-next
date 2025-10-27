@@ -1,14 +1,17 @@
 import { DateHeader } from '@/components/calendar';
 import { ThemedText, ThemedView } from '@/components/common';
+import { useI18n } from '@/hooks/use-i18n';
 import { StyleSheet } from 'react-native';
 
 export default function CalendarScreen() {
+  const { t } = useI18n('calendar');
+
   return (
     <ThemedView style={styles.container}>
       <DateHeader />
       <ThemedView style={styles.content}>
         <ThemedText style={styles.description}>
-          日历内容区域
+          {t('content_area')}
         </ThemedText>
       </ThemedView>
     </ThemedView>

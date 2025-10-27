@@ -1,0 +1,15 @@
+{
+  "title": "Calendar",
+  "content_area": "Calendar content area",
+  "weekdays": {
+    "sunday": "Sun",
+    "monday": "Mon",
+    "tuesday": "Tue",
+    "wednesday": "Wed",
+    "thursday": "Thu",
+    "friday": "Fri",
+    "saturday": "Sat"
+  },
+  "month_day": "{{month}}/{{day}}"
+}
+
