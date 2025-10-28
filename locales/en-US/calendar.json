@@ -10,6 +10,9 @@
     "friday": "Fri",
     "saturday": "Sat"
   },
-  "month_day": "{{month}}/{{day}}"
+  "month_day": "{{month}}/{{day}}",
+  "today": "Today",
+  "days_ago": "{{count}} days ago",
+  "days_later": "{{count}} days later"
 }
 
