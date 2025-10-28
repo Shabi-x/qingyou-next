@@ -128,3 +128,17 @@ export function formatYearMonth(date: Date): string {
   return `${year}/${month}`;
 }
 
+/**
+ * 计算目标日期距离今天多少天
+ * @param targetDate 目标日期
+ * @returns 天数差值（负数表示过去，正数表示未来，0表示今天）
+ */
+export function getDaysFromToday(targetDate: Date): number {
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const targetStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+  const diffTime = targetStart.getTime() - todayStart.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+

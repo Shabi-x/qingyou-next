@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/common';
 import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { isSameDay } from '@/utils/calendar';
+import { getDaysFromToday, isSameDay } from '@/utils/calendar';
 import { StyleSheet, View } from 'react-native';
 
 interface DateHeaderProps {
@@ -52,12 +52,30 @@ export function DateHeader({ selectedDate, displayYear, displayMonth, isCollapse
   const month = displayDate.getMonth() + 1;
   const day = displayDate.getDate();
 
+  // 计算相对时间（距离今天多少天）
+  const getRelativeTime = () => {
+    const diff = getDaysFromToday(displayDate);
+    if (diff === 0) {
+      return t('today');
+    } else if (diff < 0) {
+      return t('days_ago', { count: Math.abs(diff) });
+    } else {
+      return t('days_later', { count: diff });
+    }
+  };
+
+  const relativeTime = getRelativeTime();
+
   return (
     <View style={styles.container}>
-      {/* 左侧：根据逻辑显示"星期X"或"YYYY/MM" */}
-      <ThemedText style={styles.weekday}>
-        {shouldShowWeekday ? weekday : `${displayYear}/${(displayMonth + 1).toString().padStart(2, '0')}`}
-      </ThemedText>
+      <View style={styles.leftContainer}>
+        <ThemedText style={styles.weekday}>
+          {shouldShowWeekday ? weekday : `${displayYear}/${(displayMonth + 1).toString().padStart(2, '0')}`}
+        </ThemedText>
+        <ThemedText style={[styles.relativeTime, { color: secondaryColor }]}>
+          {relativeTime}
+        </ThemedText>
+      </View>
       
       {/* 右侧：年月日（仅显示周几时展示） */}
       {shouldShowWeekday && (
@@ -82,6 +100,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
+  leftContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+  },
   weekday: {
     fontSize: 34,
     fontWeight: '700',
@@ -103,6 +126,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 20,
     letterSpacing: 0,
+  },
+  relativeTime: {
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 20,
+    letterSpacing: 0,
+    marginBottom: 2,
   }
 });
 
