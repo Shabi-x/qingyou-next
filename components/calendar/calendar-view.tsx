@@ -17,7 +17,7 @@ const SWIPE_THRESHOLD = 80; // 滑动距离阈值（像素）
 const SWIPE_VELOCITY_THRESHOLD = 500; // 滑动速度阈值（像素/秒）
 const VERTICAL_SWIPE_THRESHOLD = 30;
 const DAY_CELL_HEIGHT = 52;
-const WEEK_HEIGHT = DAY_CELL_HEIGHT;
+const WEEK_HEIGHT = 70; // 折叠状态增加上下padding
 const MONTH_HEIGHT = DAY_CELL_HEIGHT * 6;
 interface CalendarViewProps {
   selectedDate?: Date;
@@ -61,6 +61,10 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     : getWeekContainingDate(currentMonthDays, new Date());
   
   const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  // 获取今天是星期几（0=Mon, 1=Tue, ..., 6=Sun）
+  const today = new Date();
+  const todayWeekdayIndex = (today.getDay() + 6) % 7; // 转换JS的周日=0 为 周一=0
   
   // 切换到上一个月
   const gotoPrevMonth = () => {
@@ -116,18 +120,29 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   const toggleCollapse = (shouldCollapse?: boolean) => {
     const newState = shouldCollapse !== undefined ? shouldCollapse : !isCollapsed;
     setIsCollapsed(newState);
+    
+    // 使用 withSpring，调整参数避免过度过冲
     calendarHeight.value = withSpring(
       newState ? WEEK_HEIGHT : MONTH_HEIGHT,
-      { damping: 25, stiffness: 200 }
+      { 
+        damping: 30,      // 增加阻尼，减少震荡
+        stiffness: 150,   // 降低弹性系数，更柔和
+        mass: 0.8,        // 降低质量，响应更快
+      }
     );
     
     onCollapseChange?.(newState);
     
     if (newState) {
+      // 折叠时自动定位到今天
       const today = new Date();
       const todayYear = today.getFullYear();
       const todayMonth = today.getMonth();
       
+      // 自动选中今天
+      onDateSelect?.(today);
+      
+      // 如果不在当前月，切换到当前月
       if (year !== todayYear || month !== todayMonth) {
         setYear(todayYear);
         setMonth(todayMonth);
@@ -251,6 +266,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         onPress={() => handleDayPress(day)}
         style={({ pressed }) => [
           styles.dayCell,
+          showWeekday && styles.dayCellCollapsed,
           pressed && { opacity: 0.5 },
         ]}
       >
@@ -293,7 +309,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
             style={[
               styles.weekdayInCell,
               { color: textSecondaryColor },
-              day.weekday === 4 && { color: accentColor },
+              day.weekday === todayWeekdayIndex && { color: accentColor },
             ]}
           >
             {weekdays[day.weekday]}
@@ -304,7 +320,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         <Text
           style={[
             styles.dayText,
-            showWeekday && { marginTop: 16 },
+            showWeekday && { marginTop: 22 },
             day.isCurrentMonth && { color: textColor },
             !day.isCurrentMonth && { color: textSecondaryColor, opacity: 0.5 },
             isToday && !isCollapsed && { color: '#FFFFFF', fontWeight: '600' },
@@ -336,7 +352,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
                 style={[
                   styles.weekdayText, 
                   { color: textSecondaryColor },
-                  index === 4 && { color: accentColor }
+                  index === todayWeekdayIndex && { color: accentColor }
                 ]}
               >
                 {weekday}
@@ -372,7 +388,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         style={styles.indicatorContainer}
         onPress={() => toggleCollapse()}
       >
-        <View style={[styles.indicator, { backgroundColor: textSecondaryColor }]} />
+        <View style={[styles.indicator, { backgroundColor: accentColor }]} />
       </Pressable>
     </View>
   );
@@ -393,8 +409,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   weekdayText: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 15,
+    fontWeight: '700',
     letterSpacing: 0.3,
   },
   calendarWrapper: {
@@ -419,6 +435,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
+  dayCellCollapsed: {
+    height: WEEK_HEIGHT,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
   todayBackground: {
     position: 'absolute',
     width: 40,
@@ -434,30 +455,32 @@ const styles = StyleSheet.create({
   },
   selectedBackgroundWithWeekday: {
     position: 'absolute',
-    width: '90%',
-    height: '90%',
+    top: 4,
+    right: 4,
+    bottom: 4,
+    left: 4,
     borderRadius: 12,
     borderWidth: 1.5,
   },
   weekdayInCell: {
     position: 'absolute',
-    top: 6,
-    fontSize: 11,
-    fontWeight: '500',
+    top: 13,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   dayText: {
-    fontSize: 17,
+    fontSize: 19,
     textAlign: 'center',
-    fontWeight: '400',
+    fontWeight: '600',
   },
   indicatorContainer: {
     alignItems: 'center',
     paddingVertical: 12,
   },
   indicator: {
-    width: 32,
-    height: 4,
-    borderRadius: 2,
-    opacity: 0.3,
+    width: 48,
+    height: 5,
+    borderRadius: 2.5,
   },
 });
