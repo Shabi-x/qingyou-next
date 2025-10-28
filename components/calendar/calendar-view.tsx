@@ -7,6 +7,7 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSpring,
   withTiming
 } from 'react-native-reanimated';
@@ -38,6 +39,29 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   // 始终定位在中间月（索引1）
   const translateX = useSharedValue(-CALENDAR_WIDTH);
   const calendarHeight = useSharedValue(MONTH_HEIGHT);
+  
+  // 为六行日期创建动画值（透明度和位移）
+  const row0Opacity = useSharedValue(1);
+  const row0TranslateY = useSharedValue(0);
+  const row1Opacity = useSharedValue(1);
+  const row1TranslateY = useSharedValue(0);
+  const row2Opacity = useSharedValue(1);
+  const row2TranslateY = useSharedValue(0);
+  const row3Opacity = useSharedValue(1);
+  const row3TranslateY = useSharedValue(0);
+  const row4Opacity = useSharedValue(1);
+  const row4TranslateY = useSharedValue(0);
+  const row5Opacity = useSharedValue(1);
+  const row5TranslateY = useSharedValue(0);
+  
+  const rowAnimations = [
+    { opacity: row0Opacity, translateY: row0TranslateY },
+    { opacity: row1Opacity, translateY: row1TranslateY },
+    { opacity: row2Opacity, translateY: row2TranslateY },
+    { opacity: row3Opacity, translateY: row3TranslateY },
+    { opacity: row4Opacity, translateY: row4TranslateY },
+    { opacity: row5Opacity, translateY: row5TranslateY },
+  ];
   
   // 标记是否正在切换月份（防止重复触发）
   const isSwitching = useRef(false);
@@ -116,9 +140,18 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     }, 50);
   };
   
+  // 计算当前选中日期所在的行索引（0-5）
+  const getSelectedWeekRowIndex = () => {
+    if (!selectedDate) return 0;
+    const weekIndex = currentMonthDays.findIndex(day => isSameDay(day.date, selectedDate));
+    return weekIndex >= 0 ? Math.floor(weekIndex / 7) : 0;
+  };
+  
   // 切换折叠状态
   const toggleCollapse = (shouldCollapse?: boolean) => {
     const newState = shouldCollapse !== undefined ? shouldCollapse : !isCollapsed;
+    const selectedRow = getSelectedWeekRowIndex();
+    
     setIsCollapsed(newState);
     
     // 使用 withSpring，调整参数避免过度过冲
@@ -130,6 +163,43 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         mass: 0.8,        // 降低质量，响应更快
       }
     );
+    
+    // 执行行动画
+    const animationConfig = {
+      damping: 28,
+      stiffness: 130,
+      mass: 0.9,
+    };
+    
+    rowAnimations.forEach((row, index) => {
+      if (newState) {
+        // 折叠：非选中行淡出并稍微向上移动
+        if (index === selectedRow) {
+          row.opacity.value = withSpring(1, animationConfig);
+          row.translateY.value = withSpring(0, animationConfig);
+        } else {
+          row.opacity.value = withSpring(0, { ...animationConfig, damping: 22 });
+          // 稍微向上移动一小段距离
+          row.translateY.value = withSpring(-15, animationConfig);
+        }
+      } else {
+        // 展开：所有行从稍微向上的位置向下滑入
+        // 立即设置初始位置（稍微向上）
+        row.translateY.value = -28;
+        row.opacity.value = 0;
+        
+        // 带延迟的向下滑入动画
+        const delayTime = index * 30; // 从上到下依次展开
+        row.opacity.value = withDelay(
+          delayTime,
+          withSpring(1, animationConfig)
+        );
+        row.translateY.value = withDelay(
+          delayTime,
+          withSpring(0, animationConfig)
+        );
+      }
+    });
     
     onCollapseChange?.(newState);
     
@@ -251,6 +321,41 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     overflow: 'hidden',
   }));
   
+  // 为每一行创建动画样式
+  const row0AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row0Opacity.value,
+    transform: [{ translateY: row0TranslateY.value }],
+  }));
+  const row1AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row1Opacity.value,
+    transform: [{ translateY: row1TranslateY.value }],
+  }));
+  const row2AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row2Opacity.value,
+    transform: [{ translateY: row2TranslateY.value }],
+  }));
+  const row3AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row3Opacity.value,
+    transform: [{ translateY: row3TranslateY.value }],
+  }));
+  const row4AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row4Opacity.value,
+    transform: [{ translateY: row4TranslateY.value }],
+  }));
+  const row5AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: row5Opacity.value,
+    transform: [{ translateY: row5TranslateY.value }],
+  }));
+  
+  const rowAnimatedStyles = [
+    row0AnimatedStyle,
+    row1AnimatedStyle,
+    row2AnimatedStyle,
+    row3AnimatedStyle,
+    row4AnimatedStyle,
+    row5AnimatedStyle,
+  ];
+  
   const handleDayPress = (day: CalendarDay) => {
     onDateSelect?.(day.date);
   };
@@ -320,7 +425,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         <Text
           style={[
             styles.dayText,
-            showWeekday && { marginTop: 22 },
+            showWeekday && styles.dayTextCollapsed,
             day.isCurrentMonth && { color: textColor },
             !day.isCurrentMonth && { color: textSecondaryColor, opacity: 0.5 },
             isToday && !isCollapsed && { color: '#FFFFFF', fontWeight: '600' },
@@ -332,39 +437,49 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     );
   };
   
-  // 渲染月视图
-  const renderMonthView = (days: CalendarDay[], key: string) => (
-    <View key={key} style={styles.monthView}>
-      <View style={styles.daysGrid}>
-        {days.map((day, index) => renderDay(day, index, false))}
+  // 渲染月视图（按行渲染，每行应用动画）
+  const renderMonthView = (days: CalendarDay[], key: string) => {
+    // 将42个日期分成6行，每行7天
+    const rows = Array.from({ length: 6 }, (_, rowIndex) => 
+      days.slice(rowIndex * 7, (rowIndex + 1) * 7)
+    );
+    
+    return (
+      <View key={key} style={styles.monthView}>
+        {rows.map((rowDays, rowIndex) => (
+          <Animated.View key={`row-${rowIndex}`} style={[styles.weekRow, rowAnimatedStyles[rowIndex]]}>
+            {rowDays.map((day, dayIndex) => renderDay(day, rowIndex * 7 + dayIndex, false))}
+          </Animated.View>
+        ))}
       </View>
-    </View>
-  );
+    );
+  };
   
   return (
     <View style={styles.container}>
-      {/* 周标题行（仅在展开态显示） */}
-      {!isCollapsed && (
-        <View style={styles.weekdayRow}>
-          {weekdays.map((weekday, index) => (
-            <View key={weekday} style={styles.weekdayCell}>
-              <Text 
-                style={[
-                  styles.weekdayText, 
-                  { color: textSecondaryColor },
-                  index === todayWeekdayIndex && { color: accentColor }
-                ]}
-              >
-                {weekday}
-              </Text>
-            </View>
-          ))}
-        </View>
-      )}
+      {/* 周标题行（始终占据空间，折叠时隐藏） */}
+      <View style={[styles.weekdayRow, isCollapsed && { opacity: 0 }]}>
+        {weekdays.map((weekday, index) => (
+          <View key={weekday} style={styles.weekdayCell}>
+            <Text 
+              style={[
+                styles.weekdayText, 
+                { color: textSecondaryColor },
+                index === todayWeekdayIndex && { color: accentColor }
+              ]}
+            >
+              {weekday}
+            </Text>
+          </View>
+        ))}
+      </View>
       
       {/* 日期网格（可滑动、可折叠） */}
       <GestureDetector gesture={panGesture}>
-        <View style={styles.calendarWrapper}>
+        <View style={[
+          styles.calendarWrapper,
+          isCollapsed && { marginTop: -39 } // 微调对齐
+        ]}>
           <Animated.View style={heightAnimatedStyle}>
             {isCollapsed ? (
               // 折叠态：只显示当前周
@@ -402,16 +517,17 @@ const styles = StyleSheet.create({
   weekdayRow: {
     flexDirection: 'row',
     marginBottom: 12,
+    paddingTop: 6,
   },
   weekdayCell: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 6,
   },
   weekdayText: {
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
+    lineHeight: 15, // 明确设置行高，确保高度可控
   },
   calendarWrapper: {
     width: '100%',
@@ -428,6 +544,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  weekRow: {
+    flexDirection: 'row',
+    width: '100%',
+  },
   dayCell: {
     width: `${100 / 7}%`,
     height: DAY_CELL_HEIGHT,
@@ -437,8 +557,6 @@ const styles = StyleSheet.create({
   },
   dayCellCollapsed: {
     height: WEEK_HEIGHT,
-    paddingTop: 10,
-    paddingBottom: 10,
   },
   todayBackground: {
     position: 'absolute',
@@ -464,15 +582,23 @@ const styles = StyleSheet.create({
   },
   weekdayInCell: {
     position: 'absolute',
-    top: 13,
+    top: 13, // 保持与高亮框 top(4) 的间距(9px)
+    width: '100%',
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.3,
+    lineHeight: 15, // 与 weekdayText 保持一致
+    textAlign: 'center',
   },
   dayText: {
     fontSize: 19,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  dayTextCollapsed: {
+    position: 'absolute',
+    top: 35, // weekdayInCell(13) + fontSize(15) + gap(7)
+    width: '100%',
   },
   indicatorContainer: {
     alignItems: 'center',
