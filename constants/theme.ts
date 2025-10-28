@@ -14,12 +14,12 @@ export const Colors = {
     // 主要颜色
     text: '#000000',              // 主文字：纯黑
     textSecondary: '#8E8E93',     // 次要文字：中灰
-    background: '#FFFFFF',        // 背景：纯白
-    backgroundSecondary: '#F8F8F8', // 次要背景：浅灰
+    background: '#F2F2F7',        // 背景：浅灰（页面背景）
+    backgroundSecondary: '#FFFFFF', // 次要背景：纯白（课程/待办卡片背景）
     
     // 卡片和容器
-    card: '#FFFFFF',              // 卡片背景
-    cardBorder: '#E5E5EA',        // 卡片边框
+    card: '#FFFFFF',              // 卡片背景：纯白（日历容器背景）
+    cardBorder: '#E8E8ED',        // 卡片边框：浅灰
     
     // 品牌色
     tint: accentColorLight,       // 主题色
@@ -34,12 +34,12 @@ export const Colors = {
     // 主要颜色
     text: '#FFFFFF',              // 主文字：纯白
     textSecondary: '#8E8E93',     // 次要文字：中灰（与浅色模式一致）
-    background: '#1C2128',        // 背景：深蓝灰
-    backgroundSecondary: '#262A31', // 次要背景：略浅的深色
+    background: '#262A31',        // 背景：浅深灰（页面背景）
+    backgroundSecondary: '#1C2128', // 次要背景：深蓝灰（课程/待办卡片背景，深色）
     
     // 卡片和容器
-    card: '#2C2C2E',              // 卡片背景：深灰
-    cardBorder: '#3A3A3C',        // 卡片边框：更浅的灰
+    card: '#1C2128',              // 卡片背景：深蓝灰（日历容器背景，深色）
+    cardBorder: '#1C2128',        // 卡片边框：深色（与卡片同色）
     
     // 品牌色
     tint: accentColorDark,        // 主题色
