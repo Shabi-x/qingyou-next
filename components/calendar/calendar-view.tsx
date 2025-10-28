@@ -8,17 +8,17 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
+  withTiming
 } from 'react-native-reanimated';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CALENDAR_WIDTH = SCREEN_WIDTH - 32; // 减去容器padding
-const SWIPE_THRESHOLD = 50;
+const SWIPE_THRESHOLD = 80; // 滑动距离阈值（像素）
+const SWIPE_VELOCITY_THRESHOLD = 500; // 滑动速度阈值（像素/秒）
 const VERTICAL_SWIPE_THRESHOLD = 30;
 const DAY_CELL_HEIGHT = 52;
 const WEEK_HEIGHT = DAY_CELL_HEIGHT;
 const MONTH_HEIGHT = DAY_CELL_HEIGHT * 6;
-
 interface CalendarViewProps {
   selectedDate?: Date;
   onDateSelect?: (date: Date) => void;
@@ -41,6 +41,9 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   
   // 标记是否正在切换月份（防止重复触发）
   const isSwitching = useRef(false);
+  
+  // 标记当前手势是否已触发预加载（防止同一手势多次触发）
+  const hasPreloaded = useRef<'next' | 'prev' | null>(null);
   
   // 生成三个月的数据
   const prevMonthYear = month === 0 ? year - 1 : year;
@@ -78,10 +81,10 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     setMonth(newMonth);
     onMonthChange?.(newYear, newMonth);
     
-    // 重置标记
+    // 快速重置标记，允许连续滑动
     setTimeout(() => {
       isSwitching.current = false;
-    }, 100);
+    }, 50);
   };
   
   // 切换到下一个月
@@ -103,10 +106,10 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     setMonth(newMonth);
     onMonthChange?.(newYear, newMonth);
     
-    // 重置标记
+    // 快速重置标记，允许连续滑动
     setTimeout(() => {
       isSwitching.current = false;
-    }, 100);
+    }, 50);
   };
   
   // 切换折叠状态
@@ -140,36 +143,75 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   
   // 手势处理
   const panGesture = Gesture.Pan()
+    .onBegin(() => {
+      // 每次手势开始时重置预加载标记
+      hasPreloaded.current = null;
+    })
     .onUpdate((event) => {
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
       
       if (isHorizontal && !isCollapsed) {
-        // 横向滑动 - 从中间位置(-CALENDAR_WIDTH)开始，添加0.8倍阻尼
-        translateX.value = -CALENDAR_WIDTH + event.translationX * 0.8;
+        // 横向滑动 - 从中间位置(-CALENDAR_WIDTH)开始，添加0.5倍阻尼（更跟手）
+        translateX.value = -CALENDAR_WIDTH + event.translationX * 0.5;
+        
+        // 【预加载策略】当滑动超过70%时，提前触发数据更新
+        // 这样在手势结束时，新的缓冲区已经准备好了
+        const preloadThreshold = CALENDAR_WIDTH * 0.7;
+        
+        if (event.translationX < -preloadThreshold && 
+            !isSwitching.current && 
+            hasPreloaded.current !== 'next') {
+          // 向左滑动超过阈值，提前加载下一个月（仅触发一次）
+          hasPreloaded.current = 'next';
+          runOnJS(gotoNextMonth)();
+        } else if (event.translationX > preloadThreshold && 
+                   !isSwitching.current && 
+                   hasPreloaded.current !== 'prev') {
+          // 向右滑动超过阈值，提前加载上一个月（仅触发一次）
+          hasPreloaded.current = 'prev';
+          runOnJS(gotoPrevMonth)();
+        }
       }
     })
     .onEnd((event) => {
       const isHorizontal = Math.abs(event.translationX) > Math.abs(event.translationY);
       
       if (isHorizontal && !isCollapsed) {
-        // 横向滑动结束
-        if (event.translationX < -SWIPE_THRESHOLD) {
-          // 向左滑 - 下一个月
-          // 先播放滑动到下月的动画
-          translateX.value = withTiming(-CALENDAR_WIDTH * 2, { duration: 300 }, () => {
-            // 动画完成后，更新数据并瞬间重置位置
+        // 横向滑动结束 - 判断是否需要切换月份
+        // 判断条件：滑动距离 或 滑动速度
+        const shouldGoNext = (
+          event.translationX < -SWIPE_THRESHOLD || 
+          event.velocityX < -SWIPE_VELOCITY_THRESHOLD
+        );
+        const shouldGoPrev = (
+          event.translationX > SWIPE_THRESHOLD || 
+          event.velocityX > SWIPE_VELOCITY_THRESHOLD
+        );
+        
+        if (shouldGoNext) {
+          // 向左滑 - 切换到下一个月
+          // 数据可能已在onUpdate中更新，这里只需确保切换完成并播放过渡动画
+          if (!isSwitching.current) {
             runOnJS(gotoNextMonth)();
+          }
+          // 快速平滑回弹到中间位置（useEffect会同步重置）
+          translateX.value = withTiming(-CALENDAR_WIDTH, { 
+            duration: 150,
           });
-        } else if (event.translationX > SWIPE_THRESHOLD) {
-          // 向右滑 - 上一个月
-          // 先播放滑动到上月的动画
-          translateX.value = withTiming(0, { duration: 300 }, () => {
-            // 动画完成后，更新数据并瞬间重置位置
+        } else if (shouldGoPrev) {
+          // 向右滑 - 切换到上一个月
+          if (!isSwitching.current) {
             runOnJS(gotoPrevMonth)();
+          }
+          translateX.value = withTiming(-CALENDAR_WIDTH, { 
+            duration: 150,
           });
         } else {
-          // 回弹到当前月
-          translateX.value = withSpring(-CALENDAR_WIDTH, { damping: 25, stiffness: 180 });
+          // 回弹到当前月（未达到切换阈值）
+          translateX.value = withSpring(-CALENDAR_WIDTH, { 
+            damping: 25, 
+            stiffness: 180 
+          });
         }
       } else {
         // 纵向滑动 - 折叠/展开
@@ -180,6 +222,9 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         }
         translateX.value = withSpring(-CALENDAR_WIDTH, { damping: 25, stiffness: 180 });
       }
+      
+      // 手势结束后重置预加载标记
+      hasPreloaded.current = null;
     });
   
   const animatedStyle = useAnimatedStyle(() => ({
