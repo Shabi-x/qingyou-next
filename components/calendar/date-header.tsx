@@ -1,15 +1,20 @@
 import { ThemedText } from '@/components/common';
 import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useState } from 'react';
+import { isSameDay } from '@/utils/calendar';
 import { StyleSheet, View } from 'react-native';
 
-export function DateHeader() {
+interface DateHeaderProps {
+  displayDate?: Date; // 当前显示的日期（选中日期或当前查看的月份）
+}
+
+export function DateHeader({ displayDate }: DateHeaderProps) {
   const secondaryColor = useThemeColor({}, 'textSecondary');
   const { t } = useI18n('calendar');
   
-  // 组件挂载时从操作系统获取当前日期
-  const [currentDate] = useState(() => new Date());
+  const today = new Date();
+  const currentDate = displayDate || today;
+  const isToday = isSameDay(currentDate, today);
 
   // 获取星期
   const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
@@ -23,18 +28,22 @@ export function DateHeader() {
 
   return (
     <View style={styles.container}>
-      {/* 左侧：星期 */}
-      <ThemedText style={styles.weekday}>{weekday}</ThemedText>
+      {/* 左侧：如果是今天显示"星期X"，否则显示"YYYY/MM" */}
+      <ThemedText style={styles.weekday}>
+        {isToday ? weekday : `${year}/${month.toString().padStart(2, '0')}`}
+      </ThemedText>
       
-      {/* 右侧：年月日 */}
-      <View style={styles.dateContainer}>
-        <ThemedText style={[styles.dateText, { color: secondaryColor }]}>
-          {year}
-        </ThemedText>
-        <ThemedText style={[styles.dateTextDay, { color: secondaryColor }]}>
-          {t('month_day', { month, day })}
-        </ThemedText>
-      </View>
+      {/* 右侧：年月日（仅今天显示） */}
+      {isToday && (
+        <View style={styles.dateContainer}>
+          <ThemedText style={[styles.dateText, { color: secondaryColor }]}>
+            {year}
+          </ThemedText>
+          <ThemedText style={[styles.dateTextDay, { color: secondaryColor }]}>
+            {t('month_day', { month, day })}
+          </ThemedText>
+        </View>
+      )}
     </View>
   );
 }
