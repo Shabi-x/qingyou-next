@@ -13,6 +13,10 @@
   "month_day": "{{month}}/{{day}}",
   "today": "Today",
   "days_ago": "{{count}} days ago",
-  "days_later": "{{count}} days later"
+  "days_later": "{{count}} days later",
+  "today_courses": "Today's Courses",
+  "today_todos": "Today's To-dos",
+  "no_courses": "No courses scheduled",
+  "no_todos": "No to-dos"
 }
 
