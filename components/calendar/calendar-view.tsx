@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { generateCalendarDays, getWeekContainingDate, isSameDay, type CalendarDay } from '@/utils/calendar';
+import { generateCalendarDays, getWeekContainingDate, isDateInCurrentWeek, isSameDay, type CalendarDay } from '@/utils/calendar';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -25,12 +25,17 @@ interface CalendarViewProps {
   onDateSelect?: (date: Date) => void;
   onMonthChange?: (year: number, month: number) => void;
   onCollapseChange?: (isCollapsed: boolean) => void;
+  backgroundColor?: string;
+  isCollapsed?: boolean; // 支持受控模式
 }
 
-export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onCollapseChange }: CalendarViewProps) {
+export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onCollapseChange, backgroundColor, isCollapsed: externalIsCollapsed }: CalendarViewProps) {
   const [year, setYear] = useState(() => (selectedDate || new Date()).getFullYear());
   const [month, setMonth] = useState(() => (selectedDate || new Date()).getMonth());
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [internalIsCollapsed, setInternalIsCollapsed] = useState(false);
+  
+  // 使用外部状态（如果提供）或内部状态
+  const isCollapsed = externalIsCollapsed !== undefined ? externalIsCollapsed : internalIsCollapsed;
   
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
@@ -152,7 +157,13 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     const newState = shouldCollapse !== undefined ? shouldCollapse : !isCollapsed;
     const selectedRow = getSelectedWeekRowIndex();
     
-    setIsCollapsed(newState);
+    // 如果是受控模式，通知外部；否则更新内部状态
+    if (externalIsCollapsed !== undefined) {
+      onCollapseChange?.(newState);
+    } else {
+      setInternalIsCollapsed(newState);
+      onCollapseChange?.(newState);
+    }
     
     // 使用 withSpring，调整参数避免过度过冲
     calendarHeight.value = withSpring(
@@ -204,13 +215,15 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     onCollapseChange?.(newState);
     
     if (newState) {
-      // 折叠时自动定位到今天
+      // 折叠时智能处理选中日期
       const today = new Date();
       const todayYear = today.getFullYear();
       const todayMonth = today.getMonth();
       
-      // 自动选中今天
-      onDateSelect?.(today);
+      // 如果选中的日期不在当前周内，自动选中今天
+      if (!isDateInCurrentWeek(selectedDate)) {
+        onDateSelect?.(today);
+      }
       
       // 如果不在当前月，切换到当前月
       if (year !== todayYear || month !== todayMonth) {
@@ -225,6 +238,48 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   useEffect(() => {
     translateX.value = -CALENDAR_WIDTH; // 直接设置，不用动画
   }, [year, month, translateX]);
+  
+  // 外部折叠状态变化时，同步动画
+  useEffect(() => {
+    if (externalIsCollapsed !== undefined) {
+      const selectedRow = getSelectedWeekRowIndex();
+      const animationConfig = {
+        damping: 28,
+        stiffness: 130,
+        mass: 0.9,
+      };
+      
+      // 更新高度动画
+      calendarHeight.value = withSpring(
+        externalIsCollapsed ? WEEK_HEIGHT : MONTH_HEIGHT,
+        { 
+          damping: 30,
+          stiffness: 150,
+          mass: 0.8,
+        }
+      );
+      
+      // 更新行动画
+      rowAnimations.forEach((row, index) => {
+        if (externalIsCollapsed) {
+          if (index === selectedRow) {
+            row.opacity.value = withSpring(1, animationConfig);
+            row.translateY.value = withSpring(0, animationConfig);
+          } else {
+            row.opacity.value = withSpring(0, { ...animationConfig, damping: 22 });
+            row.translateY.value = withSpring(-15, animationConfig);
+          }
+        } else {
+          row.translateY.value = -28;
+          row.opacity.value = 0;
+          const delayTime = index * 30;
+          row.opacity.value = withDelay(delayTime, withSpring(1, animationConfig));
+          row.translateY.value = withDelay(delayTime, withSpring(0, animationConfig));
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalIsCollapsed]);
   
   // 手势处理
   const panGesture = Gesture.Pan()
@@ -305,7 +360,12 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
         } else if (event.translationY > VERTICAL_SWIPE_THRESHOLD && isCollapsed) {
           runOnJS(toggleCollapse)(false);
         }
-        translateX.value = withSpring(-CALENDAR_WIDTH, { damping: 25, stiffness: 180 });
+        // 使用与折叠动画一致的参数
+        translateX.value = withSpring(-CALENDAR_WIDTH, { 
+          damping: 30, 
+          stiffness: 150,
+          mass: 0.8,
+        });
       }
       
       // 手势结束后重置预加载标记
@@ -377,15 +437,24 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
       >
         {/* 折叠态：选中日期的高亮背景 */}
         {isCollapsed && isSelected && (
-          <View 
-            style={[
-              styles.selectedBackgroundWithWeekday,
-              { 
-                backgroundColor: `${accentColor}15`,
-                borderColor: accentColor,
-              }
-            ]} 
-          />
+          <>
+            <View 
+              style={[
+                styles.selectedBackgroundWithWeekday,
+                { 
+                  backgroundColor: `${accentColor}15`,
+                  borderColor: accentColor,
+                }
+              ]} 
+            />
+            {/* 底部圆点强调 */}
+            <View 
+              style={[
+                styles.selectedDot,
+                { backgroundColor: accentColor }
+              ]} 
+            />
+          </>
         )}
         
         {/* 展开态：今天的圆形背景 */}
@@ -456,7 +525,7 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
   };
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, backgroundColor && { backgroundColor }]}>
       {/* 周标题行（始终占据空间，折叠时隐藏） */}
       <View style={[styles.weekdayRow, isCollapsed && { opacity: 0 }]}>
         {weekdays.map((weekday, index) => (
@@ -497,14 +566,6 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
           </Animated.View>
         </View>
       </GestureDetector>
-      
-      {/* 折叠提示指示器（可点击） */}
-      <Pressable 
-        style={styles.indicatorContainer}
-        onPress={() => toggleCollapse()}
-      >
-        <View style={[styles.indicator, { backgroundColor: accentColor }]} />
-      </Pressable>
     </View>
   );
 }
@@ -513,6 +574,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingTop: 12,
+    paddingBottom: 12,
   },
   weekdayRow: {
     flexDirection: 'row',
@@ -573,12 +635,20 @@ const styles = StyleSheet.create({
   },
   selectedBackgroundWithWeekday: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    bottom: 4,
-    left: 4,
+    top: 2,
+    right: 2,
+    bottom: 2,
+    left: 2,
     borderRadius: 12,
     borderWidth: 1.5,
+  },
+  selectedDot: {
+    position: 'absolute',
+    bottom: 7,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
   },
   weekdayInCell: {
     position: 'absolute',
@@ -599,14 +669,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 35, // weekdayInCell(13) + fontSize(15) + gap(7)
     width: '100%',
-  },
-  indicatorContainer: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  indicator: {
-    width: 48,
-    height: 5,
-    borderRadius: 2.5,
   },
 });

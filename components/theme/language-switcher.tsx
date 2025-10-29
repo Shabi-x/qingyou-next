@@ -1,11 +1,14 @@
 import { useTheme } from '@/contexts/theme-context';
 import { useI18n } from '@/hooks/use-i18n';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { supportedLanguages, type SupportedLanguage } from '@/locales';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 export function LanguageSwitcher() {
   const { colorScheme } = useTheme();
   const { currentLanguage, changeLanguage } = useI18n();
+  const buttonBackgroundColor = useThemeColor({}, 'backgroundSecondary');
+  const textColor = useThemeColor({}, 'text');
 
   const toggleLanguage = () => {
     const newLang: SupportedLanguage = 
@@ -23,13 +26,13 @@ export function LanguageSwitcher() {
       style={({ pressed }) => [
         styles.button,
         { 
-          backgroundColor: colorScheme === 'dark' ? '#2C2C2E' : '#F2F2F7',
+          backgroundColor: buttonBackgroundColor,
           opacity: pressed ? 0.7 : 1,
         }
       ]}>
       <Text style={[
         styles.text,
-        { color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }
+        { color: textColor }
       ]}>
         🌐 {getLanguageLabel()}
       </Text>

@@ -142,3 +142,39 @@ export function getDaysFromToday(targetDate: Date): number {
   return diffDays;
 }
 
+/**
+ * 获取指定日期所在周的起止日期（周一到周日）
+ * @param date 指定日期
+ * @returns { weekStart: Date, weekEnd: Date }
+ */
+export function getWeekRange(date: Date): { weekStart: Date; weekEnd: Date } {
+  const targetWeekday = date.getDay();
+  // 计算本周一的日期（周日算上一周）
+  const mondayOffset = targetWeekday === 0 ? -6 : 1 - targetWeekday;
+  const weekStart = new Date(date);
+  weekStart.setDate(date.getDate() + mondayOffset);
+  weekStart.setHours(0, 0, 0, 0);
+  
+  // 计算本周日的日期
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+  
+  return { weekStart, weekEnd };
+}
+
+/**
+ * 判断指定日期是否在当前周内（周一到周日）
+ * @param date 要判断的日期
+ * @returns 是否在当前周内
+ */
+export function isDateInCurrentWeek(date: Date | null | undefined): boolean {
+  if (!date) return false;
+  
+  const today = new Date();
+  const { weekStart, weekEnd } = getWeekRange(today);
+  
+  const targetTime = new Date(date).setHours(0, 0, 0, 0);
+  return targetTime >= weekStart.getTime() && targetTime <= weekEnd.getTime();
+}
+

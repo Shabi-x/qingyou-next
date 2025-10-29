@@ -25,6 +25,9 @@ const MAPPING = {
   'list.bullet.clipboard': 'assignment',
   'alarm.fill': 'alarm',
   'person.crop.circle': 'account-circle',
+  // Calendar icons
+  'mappin.circle.fill': 'place',
+  'arrow.triangle.2.circlepath': 'sync',
 } as IconMapping;
 
 /**

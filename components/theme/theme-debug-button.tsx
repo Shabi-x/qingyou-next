@@ -1,9 +1,12 @@
 import { useTheme } from '@/contexts/theme-context';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import React from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 export function ThemeDebugButton() {
   const { colorScheme, toggleTheme } = useTheme();
+  const buttonBackgroundColor = useThemeColor({}, 'backgroundSecondary');
+  const textColor = useThemeColor({}, 'text');
 
   return (
     <Pressable
@@ -11,13 +14,13 @@ export function ThemeDebugButton() {
       style={({ pressed }) => [
         styles.button,
         { 
-          backgroundColor: colorScheme === 'dark' ? '#2C2C2E' : '#F2F2F7',
+          backgroundColor: buttonBackgroundColor,
           opacity: pressed ? 0.7 : 1,
         }
       ]}>
       <Text style={[
         styles.text,
-        { color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }
+        { color: textColor }
       ]}>
         {colorScheme === 'light' ? '☀️ Light' : '🌙 Dark'}
       </Text>
