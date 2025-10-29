@@ -1,15 +1,15 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { generateCalendarDays, getWeekContainingDate, isSameDay, type CalendarDay } from '@/utils/calendar';
+import { generateCalendarDays, getWeekContainingDate, isDateInCurrentWeek, isSameDay, type CalendarDay } from '@/utils/calendar';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withDelay,
-    withSpring,
-    withTiming
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming
 } from 'react-native-reanimated';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -215,13 +215,15 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
     onCollapseChange?.(newState);
     
     if (newState) {
-      // 折叠时自动定位到今天
+      // 折叠时智能处理选中日期
       const today = new Date();
       const todayYear = today.getFullYear();
       const todayMonth = today.getMonth();
       
-      // 自动选中今天
-      onDateSelect?.(today);
+      // 如果选中的日期不在当前周内，自动选中今天
+      if (!isDateInCurrentWeek(selectedDate)) {
+        onDateSelect?.(today);
+      }
       
       // 如果不在当前月，切换到当前月
       if (year !== todayYear || month !== todayMonth) {
