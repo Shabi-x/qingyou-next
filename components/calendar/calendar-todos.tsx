@@ -1,3 +1,4 @@
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -29,11 +30,16 @@ export function CalendarTodos({
   onTodoToggle,
   onCoursePress
 }: CalendarTodosProps) {
+  const colorScheme = useColorScheme();
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const accentColor = useThemeColor({}, 'accent');
   const todoBackgroundColor = useThemeColor({}, 'background');
   const todoBorderColor = useThemeColor({}, 'background');
+  
+  // 白天模式标题需要左边距，与卡片内容对齐
+  const isDark = colorScheme === 'dark';
+  const titleMarginLeft = isDark ? 0 : 20;
 
   return (
     <View style={styles.container}>
@@ -45,7 +51,7 @@ export function CalendarTodos({
         {/* 今日课程 */}
         {courses.length > 0 && (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor }]}>
+            <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
               今日课程
             </Text>
             {courses.map((course, index) => (
@@ -66,7 +72,7 @@ export function CalendarTodos({
         {/* 今日待办 */}
         {todos.length > 0 && (
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor }]}>
+            <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
               今日待办
             </Text>
             {todos.map((todo, index) => (
@@ -151,7 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
     marginBottom: 16,
     letterSpacing: -0.4,

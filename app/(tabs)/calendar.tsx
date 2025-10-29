@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   indicator: {
     width: 48,
-    height: 8,
+    height: 6,
     borderRadius: 4,
   },
   content: {
