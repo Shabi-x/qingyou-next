@@ -437,15 +437,24 @@ export function CalendarView({ selectedDate, onDateSelect, onMonthChange, onColl
       >
         {/* 折叠态：选中日期的高亮背景 */}
         {isCollapsed && isSelected && (
-          <View 
-            style={[
-              styles.selectedBackgroundWithWeekday,
-              { 
-                backgroundColor: `${accentColor}15`,
-                borderColor: accentColor,
-              }
-            ]} 
-          />
+          <>
+            <View 
+              style={[
+                styles.selectedBackgroundWithWeekday,
+                { 
+                  backgroundColor: `${accentColor}15`,
+                  borderColor: accentColor,
+                }
+              ]} 
+            />
+            {/* 底部圆点强调 */}
+            <View 
+              style={[
+                styles.selectedDot,
+                { backgroundColor: accentColor }
+              ]} 
+            />
+          </>
         )}
         
         {/* 展开态：今天的圆形背景 */}
@@ -626,12 +635,20 @@ const styles = StyleSheet.create({
   },
   selectedBackgroundWithWeekday: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    bottom: 4,
-    left: 4,
+    top: 2,
+    right: 2,
+    bottom: 2,
+    left: 2,
     borderRadius: 12,
     borderWidth: 1.5,
+  },
+  selectedDot: {
+    position: 'absolute',
+    bottom: 7,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center',
   },
   weekdayInCell: {
     position: 'absolute',
