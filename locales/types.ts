@@ -1,8 +1,10 @@
+import auth from './zh-CN/auth.json';
 import calendar from './zh-CN/calendar.json';
 import common from './zh-CN/common.json';
 import mine from './zh-CN/mine.json';
 
 export const resources = {
+  auth,
   common,
   calendar,
   mine,

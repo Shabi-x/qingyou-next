@@ -1,10 +1,19 @@
+import { router } from 'expo-router';
+import { Pressable, StyleSheet, Text } from 'react-native';
+
 import { ThemedText, ThemedView } from '@/components/common';
 import { LanguageSwitcher, ThemeDebugButton } from '@/components/theme';
 import { useI18n } from '@/hooks/use-i18n';
-import { StyleSheet } from 'react-native';
+import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function MineScreen() {
   const { t } = useI18n('mine');
+  const accentColor = useThemeColor({}, 'accent');
+
+  const handleLogout = () => {
+    // 退出登录，跳转到欢迎页
+    router.replace('/(auth)');
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -20,6 +29,24 @@ export default function MineScreen() {
             <LanguageSwitcher />
             <ThemeDebugButton />
           </ThemedView>
+        </ThemedView>
+
+        {/* 退出登录按钮 */}
+        <ThemedView style={styles.logoutSection}>
+          <Pressable
+            onPress={handleLogout}
+            style={({ pressed }) => [
+              styles.logoutButton,
+              { 
+                backgroundColor: '#A3D65C',
+                opacity: pressed ? 0.8 : 1,
+              }
+            ]}
+          >
+            <Text style={styles.logoutButtonText}>
+              {t('logout')}
+            </Text>
+          </Pressable>
         </ThemedView>
       </ThemedView>
     </ThemedView>
@@ -50,6 +77,29 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     gap: 8,
+  },
+  logoutSection: {
+    marginTop: 48,
+  },
+  logoutButton: {
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#A3D65C',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  logoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 
