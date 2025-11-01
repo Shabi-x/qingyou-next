@@ -17,6 +17,7 @@ const MAPPING = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
+  'chevron.left': 'chevron-left',
   'chevron.right': 'chevron-right',
   // Tab bar icons
   'note.text': 'description',
@@ -28,6 +29,10 @@ const MAPPING = {
   // Calendar icons
   'mappin.circle.fill': 'place',
   'arrow.triangle.2.circlepath': 'sync',
+  // Auth icons
+  'lock.fill': 'lock',
+  'eye.fill': 'visibility',
+  'eye.slash.fill': 'visibility-off',
 } as IconMapping;
 
 /**

@@ -1,4 +1,4 @@
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -30,16 +30,36 @@ export function CalendarTodos({
   onTodoToggle,
   onCoursePress
 }: CalendarTodosProps) {
-  const colorScheme = useColorScheme();
+  const { t } = useI18n('calendar');
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const accentColor = useThemeColor({}, 'accent');
   const todoBackgroundColor = useThemeColor({}, 'background');
   const todoBorderColor = useThemeColor({}, 'background');
   
-  // 白天模式标题需要左边距，与卡片内容对齐
-  const isDark = colorScheme === 'dark';
-  const titleMarginLeft = isDark ? 0 : 20;
+  const titleMarginLeft = 20;
+
+  const renderEmptyState = (type: 'course' | 'todo') => {
+    const icon = type === 'course' ? 'school' : 'check-circle-outline';
+    const text = type === 'course' ? t('no_courses') : t('no_todos');
+    
+    return (
+      <Animated.View
+        entering={FadeInDown.delay(100).springify()}
+        style={[styles.emptyState, { backgroundColor: todoBackgroundColor }]}
+      >
+        <MaterialIcons 
+          name={icon as any} 
+          size={48} 
+          color={textSecondaryColor}
+          style={styles.emptyIcon}
+        />
+        <Text style={[styles.emptyText, { color: textSecondaryColor }]}>
+          {text}
+        </Text>
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -49,12 +69,12 @@ export function CalendarTodos({
         showsVerticalScrollIndicator={false}
       >
         {/* 今日课程 */}
-        {courses.length > 0 && (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
-              今日课程
-            </Text>
-            {courses.map((course, index) => (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
+            {t('today_courses')}
+          </Text>
+          {courses.length > 0 ? (
+            courses.map((course, index) => (
               <Animated.View
                 key={course.id}
                 entering={FadeInDown.delay(index * 50).springify()}
@@ -65,17 +85,19 @@ export function CalendarTodos({
                   onPress={onCoursePress}
                 />
               </Animated.View>
-            ))}
-          </View>
-        )}
+            ))
+          ) : (
+            renderEmptyState('course')
+          )}
+        </View>
 
         {/* 今日待办 */}
-        {todos.length > 0 && (
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
-              今日待办
-            </Text>
-            {todos.map((todo, index) => (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: textColor, marginLeft: titleMarginLeft }]}>
+            {t('today_todos')}
+          </Text>
+          {todos.length > 0 ? (
+            todos.map((todo, index) => (
               <AnimatedPressable
                 key={todo.id}
                 entering={FadeInDown.delay((courses.length + index) * 50).springify()}
@@ -133,9 +155,11 @@ export function CalendarTodos({
                   </Text>
                 )}
               </AnimatedPressable>
-            ))}
-          </View>
-        )}
+            ))
+          ) : (
+            renderEmptyState('todo')
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -211,5 +235,22 @@ const styles = StyleSheet.create({
   todoDueDate: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  // 空状态样式
+  emptyState: {
+    padding: 40,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 160,
+  },
+  emptyIcon: {
+    opacity: 0.3,
+    marginBottom: 12,
+  },
+  emptyText: {
+    fontSize: 15,
+    fontWeight: '500',
+    opacity: 0.5,
   },
 });

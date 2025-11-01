@@ -8,7 +8,7 @@ import 'react-native-reanimated';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  initialRouteName: '(auth)',
 };
 
 function RootLayoutNav() {
@@ -17,6 +17,7 @@ function RootLayoutNav() {
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>

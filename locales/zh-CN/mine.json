@@ -1,6 +1,7 @@
 {
   "title": "我的",
   "description": "这是个人中心页面",
-  "debug_section": "开发调试"
+  "debug_section": "开发调试",
+  "logout": "退出登录"
 }
 

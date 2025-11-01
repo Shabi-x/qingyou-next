@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
  * t('title'); // 日历
  * t('month_day', { month: 3, day: 25 }); // 3月25日
  */
-export function useI18n(namespace?: 'common' | 'calendar' | 'mine') {
+export function useI18n(namespace?: 'auth' | 'common' | 'calendar' | 'mine') {
   const { t, i18n } = useTranslation(namespace);
 
   const changeLanguage = async (lang: SupportedLanguage) => {

@@ -13,6 +13,10 @@
   "month_day": "{{month}}月{{day}}日",
   "today": "今天",
   "days_ago": "{{count}}天前",
-  "days_later": "{{count}}天后"
+  "days_later": "{{count}}天后",
+  "today_courses": "今日课程",
+  "today_todos": "今日待办",
+  "no_courses": "暂无课程安排",
+  "no_todos": "暂无待办事项"
 }
 
