@@ -2,6 +2,30 @@
   "title": "Mine",
   "description": "This is personal center page",
   "debug_section": "Debug",
-  "logout": "Logout"
+  "logout": "Logout",
+  "activity_title": "Daily Activity Heatmap",
+  "weekdays": {
+    "mon": "Mon",
+    "wed": "Wed",
+    "fri": "Fri"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
+  "legend": {
+    "less": "Less",
+    "more": "More"
+  }
 }
 

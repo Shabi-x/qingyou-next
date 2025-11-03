@@ -34,3 +34,55 @@ export function fetchDayData(date: Date): { courses: CourseItem[]; todos: TodoIt
   return mockDatabase[dateKey] || { courses: [], todos: [] };
 }
 
+// 每日活跃度数据类型
+export interface DailyActivityData {
+  date: string; // YYYY-MM-DD
+  score: number; // 0-5
+  tasks: {
+    login: boolean; // 今日登录
+    library: boolean; // 图书馆打卡
+    attendance: boolean; // 按时上课
+    running: boolean; // 晨跑打卡
+    focus: boolean; // 专注学习
+  };
+}
+
+// Mock API: 生成过去一年的活跃度数据
+export function generateUserActivityData(): DailyActivityData[] {
+  const data: DailyActivityData[] = [];
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - 365); // 从一年前开始
+  
+  const currentDate = new Date(startDate);
+  
+  while (currentDate <= today) {
+    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+    
+    // 随机生成任务完成情况（模拟真实数据）
+    const login = Math.random() > 0.2; // 80% 概率登录
+    const library = Math.random() > 0.6; // 40% 概率去图书馆
+    const attendance = Math.random() > 0.5; // 50% 概率按时上课
+    const running = Math.random() > 0.7; // 30% 概率晨跑
+    const focus = Math.random() > 0.4; // 60% 概率专注学习
+    
+    const score = [login, library, attendance, running, focus].filter(Boolean).length;
+    
+    data.push({
+      date: dateStr,
+      score,
+      tasks: {
+        login,
+        library,
+        attendance,
+        running,
+        focus,
+      },
+    });
+    
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return data;
+}
+
