@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { ThemedText, ThemedView } from '@/components/common';
-import { UserActiveCalendar } from '@/components/mine';
+import { UserActiveCalendar, UserProfile } from '@/components/mine';
 import { LanguageSwitcher, ThemeDebugButton } from '@/components/theme';
 import { useI18n } from '@/hooks/use-i18n';
 import { generateUserActivityData } from '@/utils/mock-data';
@@ -12,6 +12,14 @@ export default function MineScreen() {
   
   // 获取 mock 数据
   const activityData = generateUserActivityData();
+  
+  // Mock 用户数据
+  const userData = {
+    name: '梁少峻',
+    studentId: 'B22042219',
+    department: '计算机学院、软件学院、网络空间安全学院',
+    major: '软件工程',
+  };
 
   const handleLogout = () => {
     // 退出登录，跳转到欢迎页
@@ -26,10 +34,12 @@ export default function MineScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedView style={styles.content}>
-          <ThemedText type="title">{t('title')}</ThemedText>
-          <ThemedText style={styles.description}>
-            {t('description')}
-          </ThemedText>
+          {/* 用户信息 */}
+          <UserProfile 
+            name={userData.name}
+            studentId={userData.studentId}
+            major={userData.major}
+          />
           
           {/* 每日任务热力图 */}
           <UserActiveCalendar data={activityData} />
@@ -79,10 +89,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 16,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
   },
   debugSection: {
     marginTop: 32,
