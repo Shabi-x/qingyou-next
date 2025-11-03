@@ -2,6 +2,30 @@
   "title": "我的",
   "description": "这是个人中心页面",
   "debug_section": "开发调试",
-  "logout": "退出登录"
+  "logout": "退出登录",
+  "activity_title": "每日任务热力图",
+  "weekdays": {
+    "mon": "周一",
+    "wed": "周三",
+    "fri": "周五"
+  },
+  "months": {
+    "jan": "1月",
+    "feb": "2月",
+    "mar": "3月",
+    "apr": "4月",
+    "may": "5月",
+    "jun": "6月",
+    "jul": "7月",
+    "aug": "8月",
+    "sep": "9月",
+    "oct": "10月",
+    "nov": "11月",
+    "dec": "12月"
+  },
+  "legend": {
+    "less": "少",
+    "more": "多"
+  }
 }
 
