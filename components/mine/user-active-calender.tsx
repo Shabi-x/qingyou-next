@@ -131,88 +131,90 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
   }, [monthBlocks]);
   
   return (
-    <View style={[styles.container, { backgroundColor: cardBackground }]}>
-      {/* 标题 */}
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: textColor }]}>
-          {t('activity_title')}
-        </Text>
-      </View>
-      
-      {/* 热力图主体 */}
-      <View style={styles.chartContainer}>
-        {/* 左侧星期标签（固定） */}
-        <View style={styles.weekdayLabelsFixed}>
-          {[
-            { key: 'mon', row: 1 },
-            { key: 'wed', row: 3 },
-            { key: 'fri', row: 5 },
-          ].map((item) => (
-            <Text
-              key={item.key}
-              style={[
-                styles.weekdayLabel,
-                { 
-                  color: textSecondaryColor, 
-                  top: item.row * 15  // 每行高度：格子12px + 间距3px
-                }
-              ]}
-            >
-              {t(`weekdays.${item.key}` as any)}
-            </Text>
-          ))}
+    <View style={styles.wrapper}>
+      <View style={[styles.container, { backgroundColor: cardBackground }]}>
+        {/* 标题 */}
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: textColor }]}>
+            {t('activity_title')}
+          </Text>
         </View>
         
-        {/* 右侧可滚动区域 */}
-        <ScrollView 
-          ref={scrollViewRef}
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* 网格容器 - 按月份分块 */}
-          <View style={styles.gridContainer}>
-            {monthBlocks.map((block, blockIndex) => (
-              <View 
-                key={blockIndex} 
+        {/* 热力图主体 */}
+        <View style={styles.chartContainer}>
+          {/* 左侧星期标签（固定） */}
+          <View style={styles.weekdayLabelsFixed}>
+            {[
+              { key: 'mon', row: 1 },
+              { key: 'wed', row: 3 },
+              { key: 'fri', row: 5 },
+            ].map((item) => (
+              <Text
+                key={item.key}
                 style={[
-                  styles.monthBlock,
-                  blockIndex > 0 && { marginLeft: 10 } // 月份间距
+                  styles.weekdayLabel,
+                  { 
+                    color: textSecondaryColor, 
+                    top: item.row * 15  // 每行高度：格子12px + 间距3px
+                  }
                 ]}
               >
-                {/* 该月的周列 */}
-                <View style={styles.weeksContainer}>
-                  {block.weeks.map((week, weekIndex) => (
-                    <View key={weekIndex} style={styles.week}>
-                      {week.map((day, dayIndex) => (
-                        <View
-                          key={dayIndex}
-                          style={[
-                            styles.day,
-                            {
-                              backgroundColor: day.score >= 0 ? getColorForScore(day.score) : 'transparent',
-                            },
-                          ]}
-                        />
-                      ))}
-                    </View>
-                  ))}
-                </View>
-                
-                {/* 该月的标签 */}
-                <View style={styles.monthLabelContainer}>
-                  <Text style={[styles.monthLabel, { color: textSecondaryColor }]}>
-                    {t(`months.${monthKeys[block.monthIndex]}` as any)}
-                  </Text>
-                </View>
-              </View>
+                {t(`weekdays.${item.key}` as any)}
+              </Text>
             ))}
           </View>
-        </ScrollView>
+          
+          {/* 右侧可滚动区域 */}
+          <ScrollView 
+            ref={scrollViewRef}
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {/* 网格容器 - 按月份分块 */}
+            <View style={styles.gridContainer}>
+              {monthBlocks.map((block, blockIndex) => (
+                <View 
+                  key={blockIndex} 
+                  style={[
+                    styles.monthBlock,
+                    blockIndex > 0 && { marginLeft: 10 } // 月份间距
+                  ]}
+                >
+                  {/* 该月的周列 */}
+                  <View style={styles.weeksContainer}>
+                    {block.weeks.map((week, weekIndex) => (
+                      <View key={weekIndex} style={styles.week}>
+                        {week.map((day, dayIndex) => (
+                          <View
+                            key={dayIndex}
+                            style={[
+                              styles.day,
+                              {
+                                backgroundColor: day.score >= 0 ? getColorForScore(day.score) : 'transparent',
+                              },
+                            ]}
+                          />
+                        ))}
+                      </View>
+                    ))}
+                  </View>
+                  
+                  {/* 该月的标签 */}
+                  <View style={styles.monthLabelContainer}>
+                    <Text style={[styles.monthLabel, { color: textSecondaryColor }]}>
+                      {t(`months.${monthKeys[block.monthIndex]}` as any)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       </View>
       
-      {/* 底部图例 */}
+      {/* 底部图例  */}
       <View style={styles.legend}>
         <Text style={[styles.legendText, { color: textSecondaryColor }]}>
           {t('legend.less')}
@@ -235,10 +237,12 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    marginVertical: 8,
+  },
   container: {
     borderRadius: 8,
     padding: 14,
-    marginVertical: 8,
   },
   header: {
     marginBottom: 10,
@@ -302,7 +306,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginTop: 4,
+    marginTop: 8,
     gap: 3,
   },
   legendText: {
