@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -93,12 +94,18 @@ export default function WelcomeScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       {/* Logo 区域 */}
       <View style={styles.logoContainer}>
-        <View style={[
-          styles.logoPlaceholder,
-          { backgroundColor: isDark ? '#333' : '#ddd' }
-        ]} />
-        <Text style={[styles.appTitle, { color: textColor }]}>
-          {t('app_title')}
+        <View style={styles.logoRow}>
+          <Image 
+            source={require('@/assets/images/welcome.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.appTitle, { color: textColor }]}>
+            {t('app_title')}
+          </Text>
+        </View>
+        <Text style={[styles.slogan, { color: textSecondaryColor }]}>
+          用热爱创造无限可能
         </Text>
       </View>
 
@@ -230,22 +237,33 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: '20%',
+    paddingTop: '30%',
   },
-  logoPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    marginBottom: 20,
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
   },
   appTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0,
+  },
+  slogan: {
+    fontSize: 14,
+    letterSpacing: 6,
+    textAlign: 'center',
   },
   bottomContent: {
     paddingHorizontal: 32,
     paddingTop: 20,
+    marginBottom: 40,
   },
   agreementContainer: {
     marginTop: 16,
@@ -344,6 +362,7 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 40,
     shadowColor: '#A3D65C',
     shadowOffset: {
       width: 0,

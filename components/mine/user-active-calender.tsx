@@ -236,12 +236,12 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 8,
+    padding: 14,
     marginVertical: 8,
   },
   header: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   title: {
     fontSize: 17,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   monthLabelContainer: {
     height: 20,
-    marginTop: 6,
+    marginTop: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginTop: 10,
+    marginTop: 4,
     gap: 3,
   },
   legendText: {
