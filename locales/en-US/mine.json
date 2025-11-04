@@ -3,7 +3,6 @@
   "description": "This is personal center page",
   "debug_section": "Debug",
   "logout": "Logout",
-  "activity_title": "Daily Activity Heatmap",
   "weekdays": {
     "mon": "Mon",
     "wed": "Wed",
