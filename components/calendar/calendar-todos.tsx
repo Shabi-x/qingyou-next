@@ -1,3 +1,4 @@
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -31,11 +32,16 @@ export function CalendarTodos({
   onCoursePress
 }: CalendarTodosProps) {
   const { t } = useI18n('calendar');
+  const colorScheme = useColorScheme();
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const accentColor = useThemeColor({}, 'accent');
-  const todoBackgroundColor = useThemeColor({}, 'background');
-  const todoBorderColor = useThemeColor({}, 'background');
+  const itemBackgroundColor = useThemeColor({}, 'background');
+  const borderColor = useThemeColor({}, 'cardBorder');
+  
+  // 暗夜模式：有背景色（较浅的灰色），无边框
+  // 白天模式：无背景色，有边框
+  const isDark = colorScheme === 'dark';
   
   const titleMarginLeft = 20;
 
@@ -46,7 +52,13 @@ export function CalendarTodos({
     return (
       <Animated.View
         entering={FadeInDown.delay(100).springify()}
-        style={[styles.emptyState, { backgroundColor: todoBackgroundColor }]}
+        style={[
+          styles.emptyState, 
+          { 
+            backgroundColor: isDark ? itemBackgroundColor : 'transparent',
+            borderColor: isDark ? 'transparent' : borderColor,
+          }
+        ]}
       >
         <MaterialIcons 
           name={icon as any} 
@@ -105,8 +117,8 @@ export function CalendarTodos({
                 style={[
                   styles.todoItem,
                   {
-                    backgroundColor: todoBackgroundColor,
-                    borderColor: todoBorderColor,
+                    backgroundColor: isDark ? itemBackgroundColor : 'transparent',
+                    borderColor: isDark ? 'transparent' : borderColor,
                   }
                 ]}
               >
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 70,
   },
   section: {
     marginBottom: 28,
@@ -243,6 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 160,
+    borderWidth: 1,
   },
   emptyIcon: {
     opacity: 0.3,
