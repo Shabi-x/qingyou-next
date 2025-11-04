@@ -28,7 +28,8 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
     // 浅色模式下的绿色渐变 - 更柔和的颜色
     const lightColors = ['#EBEDF0', '#C6E48B', '#7BC96F', '#49AF5D', '#2E8840', '#1A5928'];
     // 深色模式下的绿色渐变 - 优化对比度
-    const darkColors = ['#1C1F26', '#0E4429', '#006D32', '#26A641', '#39D353', '#4ADE68'];
+    // 第一个颜色使用灰黑色，确保在深色背景下清晰可见且风格统一
+    const darkColors = ['#30363D', '#0E4429', '#006D32', '#26A641', '#39D353', '#4ADE68'];
     
     const isDark = colorScheme === 'dark';
     const colors = isDark ? darkColors : lightColors;
