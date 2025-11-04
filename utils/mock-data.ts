@@ -60,7 +60,7 @@ export function generateUserActivityData(): DailyActivityData[] {
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
     
     // 随机生成任务完成情况（模拟真实数据）
-    const login = Math.random() > 0.2; // 80% 概率登录
+    const login = Math.random() > 0.8; // 20% 概率登录
     const library = Math.random() > 0.6; // 40% 概率去图书馆
     const attendance = Math.random() > 0.5; // 50% 概率按时上课
     const running = Math.random() > 0.7; // 30% 概率晨跑

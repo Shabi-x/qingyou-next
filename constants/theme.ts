@@ -11,44 +11,44 @@ const accentColorDark = '#A3D65C';   // 保持一致的强调色
 
 export const Colors = {
   light: {
-    // 主要颜色
-    text: '#000000',              // 主文字：纯黑
-    textSecondary: '#8E8E93',     // 次要文字：中灰
-    background: '#F2F2F7',        // 背景：浅灰（页面背景）
-    backgroundSecondary: '#FFFFFF', // 次要背景：纯白（课程/待办卡片背景）
+    // 主要颜色（添加 FF 确保完全不透明）
+    text: '#000000FF',              // 主文字：纯黑
+    textSecondary: '#8E8E93FF',     // 次要文字：中灰
+    background: '#F2F2F7FF',        // 背景：浅灰（页面背景）
+    backgroundSecondary: '#FFFFFFFF', // 次要背景：纯白（课程/待办卡片背景）
     
     // 卡片和容器
-    card: '#FFFFFF',              // 卡片背景：纯白（日历容器背景）
-    cardBorder: '#E8E8ED',        // 卡片边框：浅灰
+    card: '#FFFFFFFF',              // 卡片背景：纯白（日历容器背景）
+    cardBorder: '#E8E8EDFF',        // 卡片边框：浅灰
     
     // 品牌色
     tint: accentColorLight,       // 主题色
     accent: accentColorLight,     // 强调色（绿色）
     
     // 图标
-    icon: '#8E8E93',              // 图标颜色
-    tabIconDefault: '#8E8E93',    // Tab 默认图标
-    tabIconSelected: '#000000',   // Tab 选中图标
+    icon: '#8E8E93FF',              // 图标颜色
+    tabIconDefault: '#8E8E93FF',    // Tab 默认图标
+    tabIconSelected: '#000000FF',   // Tab 选中图标
   },
   dark: {
-    // 主要颜色
-    text: '#FFFFFF',              // 主文字：纯白
-    textSecondary: '#8E8E93',     // 次要文字：中灰（与浅色模式一致）
-    background: '#262A31',        // 背景：浅深灰（页面背景）
-    backgroundSecondary: '#1C2128', // 次要背景：深蓝灰（课程/待办卡片背景，深色）
+    // 主要颜色（添加 FF 确保完全不透明）
+    text: '#FFFFFFFF',              // 主文字：纯白
+    textSecondary: '#8E8E93FF',     // 次要文字：中灰（与浅色模式一致）
+    background: '#262A31FF',        // 背景：深灰（页面背景）
+    backgroundSecondary: '#1C2128FF', // 次要背景：深蓝灰（课程/待办卡片背景）
     
     // 卡片和容器
-    card: '#1C2128',              // 卡片背景：深蓝灰（日历容器背景，深色）
-    cardBorder: '#1C2128',        // 卡片边框：深色（与卡片同色）
+    card: '#1C2128FF',              // 卡片背景：深蓝灰（日历容器背景）
+    cardBorder: '#1C2128FF',        // 卡片边框：深色（与卡片同色）
     
     // 品牌色
     tint: accentColorDark,        // 主题色
     accent: accentColorDark,      // 强调色（绿色）
     
     // 图标
-    icon: '#8E8E93',              // 图标颜色
-    tabIconDefault: '#8E8E93',    // Tab 默认图标
-    tabIconSelected: '#FFFFFF',   // Tab 选中图标
+    icon: '#8E8E93FF',              // 图标颜色
+    tabIconDefault: '#8E8E93FF',    // Tab 默认图标
+    tabIconSelected: '#FFFFFFFF',   // Tab 选中图标
   },
 };
 

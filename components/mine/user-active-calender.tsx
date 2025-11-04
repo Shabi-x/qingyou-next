@@ -1,3 +1,4 @@
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import type { DailyActivityData } from '@/utils/mock-data';
@@ -14,7 +15,7 @@ export interface UserActiveCalendarProps {
  */
 export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
   const { t } = useI18n('mine');
-  const textColor = useThemeColor({}, 'text');
+  const colorScheme = useColorScheme();
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const cardBackground = useThemeColor({}, 'card');
   const scrollViewRef = useRef<ScrollView>(null);
@@ -27,9 +28,10 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
     // 浅色模式下的绿色渐变 - 更柔和的颜色
     const lightColors = ['#EBEDF0', '#C6E48B', '#7BC96F', '#49AF5D', '#2E8840', '#1A5928'];
     // 深色模式下的绿色渐变 - 优化对比度
-    const darkColors = ['#1C1F26', '#0E4429', '#006D32', '#26A641', '#39D353', '#4ADE68'];
+    // 第一个颜色使用灰黑色，确保在深色背景下清晰可见且风格统一
+    const darkColors = ['#30363D', '#0E4429', '#006D32', '#26A641', '#39D353', '#4ADE68'];
     
-    const isDark = cardBackground === '#1C2128'; // 简单判断是否为深色模式
+    const isDark = colorScheme === 'dark';
     const colors = isDark ? darkColors : lightColors;
     
     return colors[score] || colors[0];
@@ -133,13 +135,6 @@ export function UserActiveCalendar({ data }: UserActiveCalendarProps) {
   return (
     <View style={styles.wrapper}>
       <View style={[styles.container, { backgroundColor: cardBackground }]}>
-        {/* 标题 */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: textColor }]}>
-            {t('activity_title')}
-          </Text>
-        </View>
-        
         {/* 热力图主体 */}
         <View style={styles.chartContainer}>
           {/* 左侧星期标签（固定） */}
@@ -243,17 +238,6 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     padding: 14,
-  },
-  header: {
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '600',
-    marginBottom: 0,
-  },
-  subtitle: {
-    fontSize: 13,
   },
   chartContainer: {
     flexDirection: 'row',

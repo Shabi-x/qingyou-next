@@ -36,6 +36,10 @@ export default function WelcomeScreen() {
   // 动画值
   const contentOpacity = useSharedValue(0);
   const contentTranslateY = useSharedValue(50);
+  
+  // Modal 动画值
+  const modalOverlayOpacity = useSharedValue(0);
+  const modalContentTranslateY = useSharedValue(300);
 
   useEffect(() => {
     // 延迟500ms后显示底部内容，从隐到显向上浮动
@@ -54,9 +58,43 @@ export default function WelcomeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Modal 动画效果
+  useEffect(() => {
+    if (showReminderModal) {
+      // 打开动画：遮罩淡入 + 内容滑入
+      modalOverlayOpacity.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      modalContentTranslateY.value = withTiming(0, {
+        duration: 400,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // 关闭动画：内容滑出 + 遮罩淡出
+      modalContentTranslateY.value = withTiming(300, {
+        duration: 250,
+        easing: Easing.in(Easing.cubic),
+      });
+      modalOverlayOpacity.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.in(Easing.ease),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showReminderModal]);
+
   const animatedContentStyle = useAnimatedStyle(() => ({
     opacity: contentOpacity.value,
     transform: [{ translateY: contentTranslateY.value }],
+  }));
+
+  const animatedOverlayStyle = useAnimatedStyle(() => ({
+    opacity: modalOverlayOpacity.value,
+  }));
+
+  const animatedModalContentStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: modalContentTranslateY.value }],
   }));
 
   const handleGetStarted = () => {
@@ -172,22 +210,24 @@ export default function WelcomeScreen() {
       <Modal
         visible={showReminderModal}
         transparent
-        animationType="slide"
         onRequestClose={() => setShowReminderModal(false)}
       >
-        <Pressable 
-          style={styles.modalOverlay}
-          onPress={() => setShowReminderModal(false)}
+        <Animated.View 
+          style={[styles.modalOverlay, animatedOverlayStyle]}
         >
           <Pressable 
+            style={styles.overlayTouchable}
+            onPress={() => setShowReminderModal(false)}
+          />
+          <Animated.View 
             style={[
               styles.modalContent,
               { 
                 backgroundColor: isDark ? '#1C2128' : '#FFFFFF',
                 paddingBottom: insets.bottom + 16,
-              }
+              },
+              animatedModalContentStyle,
             ]}
-            onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHandle} />
             
@@ -222,8 +262,8 @@ export default function WelcomeScreen() {
                 {t('agree_and_continue')}
               </Text>
             </Pressable>
-          </Pressable>
-        </Pressable>
+          </Animated.View>
+        </Animated.View>
       </Modal>
     </View>
   );
@@ -321,6 +361,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
+  },
+  overlayTouchable: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   modalContent: {
     borderTopLeftRadius: 20,
