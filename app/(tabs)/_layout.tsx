@@ -18,11 +18,11 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const TAB_COUNT = 4;
 const TAB_WIDTH = SCREEN_WIDTH / TAB_COUNT;
-const CONTENT_HEIGHT = 60; // 内容区域高度（不包括 SafeArea）
+const CONTENT_HEIGHT = 80; // 内容区域高度（不包括 SafeArea）
 
 // Icon 容器的尺寸（用于计算高亮块）
-const ICON_CONTAINER_WIDTH = 66; // paddingHorizontal(20*2) + icon(26)
-const ICON_CONTAINER_HEIGHT = 42; // paddingVertical(8*2) + icon(26)
+const ICON_CONTAINER_WIDTH = 70; // paddingHorizontal(20*2) + icon(26)
+const ICON_CONTAINER_HEIGHT = 50; // paddingVertical(8*2) + icon(26)
 
 function CustomTabBarButton({ children, onPress }: BottomTabBarButtonProps) {
   return (
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: ICON_CONTAINER_WIDTH,
     height: ICON_CONTAINER_HEIGHT,
-    borderRadius: 21,
+    borderRadius: 50,
     // 垂直居中：(CONTENT_HEIGHT - ICON_CONTAINER_HEIGHT) / 2
     top: (CONTENT_HEIGHT - ICON_CONTAINER_HEIGHT) / 2,
   },
