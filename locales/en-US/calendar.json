@@ -17,6 +17,30 @@
   "today_courses": "Today's Courses",
   "today_todos": "Today's To-dos",
   "no_courses": "No courses scheduled",
-  "no_todos": "No to-dos"
+  "no_todos": "No to-dos",
+  "add_todo": {
+    "todo": "To-do",
+    "course": "Course",
+    "confirm": "Confirm",
+    "date_format": "{{month}}/{{day}}/{{year}}",
+    "todo_form": {
+      "title": "Title",
+      "title_placeholder": "Enter to-do title",
+      "subtitle": "Notes",
+      "subtitle_placeholder": "Add notes (optional)",
+      "due_time": "Due Time",
+      "due_time_placeholder": "Set due time (optional)"
+    },
+    "course_form": {
+      "name": "Course Name",
+      "name_placeholder": "Enter course name",
+      "location": "Location",
+      "location_placeholder": "Enter location",
+      "start_time": "Start Time",
+      "start_time_placeholder": "e.g., 08:00",
+      "end_time": "End Time",
+      "end_time_placeholder": "e.g., 09:40"
+    }
+  }
 }
 
