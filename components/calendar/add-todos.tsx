@@ -2,10 +2,10 @@ import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useDraggableButton } from '@/utils/use-draggable-button';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import Animated, { Easing, FadeIn, FadeOut, SlideInDown, SlideInLeft, SlideInRight, SlideOutDown, SlideOutLeft, SlideOutRight, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 interface AddTodosButtonProps {
   onAdd?: (type: 'todo' | 'course', date: Date) => void;
@@ -17,7 +17,6 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
   const { t } = useI18n('calendar');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'todo' | 'course'>('todo');
-  const previousType = useRef<'todo' | 'course'>('todo');
   
   // 待办表单状态
   const [todoTitle, setTodoTitle] = useState('');
@@ -44,12 +43,41 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
   // 白色滑块动画
   const slidePosition = useSharedValue(selectedType === 'todo' ? 0 : 1);
 
+  // Modal 动画值
+  const modalOverlayOpacity = useSharedValue(0);
+  const modalContentTranslateY = useSharedValue(300);
+
   useEffect(() => {
     slidePosition.value = withTiming(selectedType === 'todo' ? 0 : 1, {
       duration: 200,
       easing: Easing.out(Easing.cubic),
     });
   }, [selectedType, slidePosition]);
+
+  // Modal 显示/隐藏动画
+  useEffect(() => {
+    if (isModalVisible) {
+      // 打开动画：遮罩淡入 + 内容滑入
+      modalOverlayOpacity.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+      modalContentTranslateY.value = withTiming(0, {
+        duration: 400,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // 关闭动画：内容滑出 + 遮罩淡出
+      modalContentTranslateY.value = withTiming(300, {
+        duration: 250,
+        easing: Easing.in(Easing.cubic),
+      });
+      modalOverlayOpacity.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.in(Easing.ease),
+      });
+    }
+  }, [isModalVisible, modalOverlayOpacity, modalContentTranslateY]);
 
   const slideAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -60,6 +88,14 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
       ],
     };
   });
+
+  const animatedOverlayStyle = useAnimatedStyle(() => ({
+    opacity: modalOverlayOpacity.value,
+  }));
+
+  const animatedModalContentStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: modalContentTranslateY.value }],
+  }));
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
@@ -101,25 +137,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
   };
 
   const handleTypeChange = (type: 'todo' | 'course') => {
-    previousType.current = selectedType;
     setSelectedType(type);
-  };
-
-  // 根据切换方向决定动画
-  const getEnteringAnimation = () => {
-    if (selectedType === 'course') {
-      return SlideInLeft.duration(200);
-    } else {
-      return SlideInRight.duration(200);
-    }
-  };
-
-  const getExitingAnimation = () => {
-    if (previousType.current === 'todo' && selectedType === 'course') {
-      return SlideOutLeft.duration(200);
-    } else {
-      return SlideOutRight.duration(200);
-    }
   };
 
   return (
@@ -145,24 +163,23 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
         animationType="none"
         onRequestClose={handleCloseModal}
       >
-        {/* 遮罩层 */}
-        <Pressable
-          style={styles.overlay}
-          onPress={handleCloseModal}
+        <Animated.View 
+          style={[styles.modalOverlay, animatedOverlayStyle]}
         >
-          <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(200)}
-            style={[styles.overlayBackground, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}
+          {/* 遮罩层 */}
+          <Pressable 
+            style={styles.overlayTouchable}
+            onPress={handleCloseModal}
           />
-        </Pressable>
-
-        {/* 半屏内容 */}
-        <Animated.View
-          entering={SlideInDown.duration(300).springify()}
-          exiting={SlideOutDown.duration(250)}
-          style={[styles.modalContent, { backgroundColor: cardBackgroundColor }]}
-        >
+          
+          {/* 半屏内容 */}
+          <Animated.View
+            style={[
+              styles.modalContent, 
+              { backgroundColor: cardBackgroundColor },
+              animatedModalContentStyle,
+            ]}
+          >
           {/* 顶部区域 */}
           <View style={styles.header}>
             {/* 日期选择器 */}
@@ -187,10 +204,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
           <View style={styles.content}>
             {selectedType === 'todo' ? (
               // 待办表单
-              <Animated.ScrollView
-                key="todo-form"
-                entering={getEnteringAnimation()}
-                exiting={getExitingAnimation()}
+              <ScrollView
                 style={styles.scrollView}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
@@ -265,13 +279,10 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
                   </View>
                 </View>
               </View>
-              </Animated.ScrollView>
+              </ScrollView>
             ) : (
               // 课程表单
-              <Animated.ScrollView
-                key="course-form"
-                entering={getEnteringAnimation()}
-                exiting={getExitingAnimation()}
+              <ScrollView
                 style={styles.scrollView}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
@@ -368,7 +379,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
                   </View>
                 </View>
               </View>
-              </Animated.ScrollView>
+              </ScrollView>
             )}
           </View>
 
@@ -395,25 +406,9 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
               />
 
               <View style={styles.switchTextContainer}>
-                {selectedType === 'todo' ? (
-                  <Animated.Text
-                    key="todo-text"
-                    entering={FadeIn.duration(200)}
-                    exiting={FadeOut.duration(200)}
-                    style={[styles.switchText, { color: textColor }]}
-              >
-                {t('add_todo.todo')}
-                  </Animated.Text>
-                ) : (
-                  <Animated.Text
-                    key="course-text"
-                    entering={FadeIn.duration(200)}
-                    exiting={FadeOut.duration(200)}
-                    style={[styles.switchText, { color: textColor }]}
-                  >
-                    {t('add_todo.course')}
-                  </Animated.Text>
-                )}
+                <Text style={[styles.switchText, { color: textColor }]}>
+                  {selectedType === 'todo' ? t('add_todo.todo') : t('add_todo.course')}
+                </Text>
               </View>
 
               <MaterialIcons
@@ -433,6 +428,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
               <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
           </TouchableOpacity>
           </View>
+          </Animated.View>
         </Animated.View>
       </Modal>
     </>
@@ -454,17 +450,19 @@ const styles = StyleSheet.create({
   },
 
   // 模态框
-  overlay: {
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
   },
-  overlayBackground: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  modalContent: {
+  overlayTouchable: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
+    bottom: 0,
+  },
+  modalContent: {
     height: '55%',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
