@@ -374,7 +374,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
 
           {/* 底部：选项卡 + 确定按钮 */}
           <View style={styles.bottomBar}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.switchContainer, { backgroundColor: switchBgColor }]}
               onPress={() => handleTypeChange(selectedType === 'todo' ? 'course' : 'todo')}
               activeOpacity={0.7}
@@ -388,7 +388,7 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
               />
 
               <MaterialIcons
-                name="check-circle-outline"
+                name="task-alt"
                 size={22}
                 color={selectedType === 'todo' ? textColor : textSecondaryColor}
                 style={styles.iconLeft}
@@ -401,8 +401,8 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
                     entering={FadeIn.duration(200)}
                     exiting={FadeOut.duration(200)}
                     style={[styles.switchText, { color: textColor }]}
-                  >
-                    {t('add_todo.todo')}
+              >
+                {t('add_todo.todo')}
                   </Animated.Text>
                 ) : (
                   <Animated.Text
@@ -424,14 +424,14 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
               />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.confirmButton, { backgroundColor: accentColor }]}
-              onPress={handleConfirm}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.confirmButtonText}>{t('add_todo.confirm')}</Text>
+          <TouchableOpacity
+            style={[styles.confirmButton, { backgroundColor: accentColor }]}
+            onPress={handleConfirm}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.confirmButtonText}>{t('add_todo.confirm')}</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
+          </TouchableOpacity>
           </View>
         </Animated.View>
       </Modal>
