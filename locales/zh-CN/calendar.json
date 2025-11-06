@@ -17,6 +17,12 @@
   "today_courses": "今日课程",
   "today_todos": "今日待办",
   "no_courses": "暂无课程安排",
-  "no_todos": "暂无待办事项"
+  "no_todos": "暂无待办事项",
+  "add_todo": {
+    "todo": "待办",
+    "course": "课程",
+    "confirm": "确定",
+    "date_format": "{{year}} 年 {{month}} 月 {{day}} 日"
+  }
 }
 

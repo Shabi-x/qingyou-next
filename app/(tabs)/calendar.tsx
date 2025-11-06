@@ -1,4 +1,4 @@
-import { CalendarTodos, CalendarView, DateHeader } from '@/components/calendar';
+import { AddTodosButton, CalendarTodos, CalendarView, DateHeader } from '@/components/calendar';
 import { CourseDetailPanel } from '@/components/calendar/course-detail-panel';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { fetchDayData } from '@/utils/mock-data';
@@ -203,6 +203,15 @@ export default function CalendarScreen() {
         visible={isPanelVisible}
         onClose={handlePanelClose}
         courseId={selectedCourseId}
+      />
+
+      {/* 添加待办按钮（可拖动，自动贴边） */}
+      <AddTodosButton 
+        style={{
+          position: 'absolute',
+          bottom: 130,
+          zIndex: 999,
+        }}
       />
     </View>
   );

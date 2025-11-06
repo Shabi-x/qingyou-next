@@ -17,6 +17,12 @@
   "today_courses": "Today's Courses",
   "today_todos": "Today's To-dos",
   "no_courses": "No courses scheduled",
-  "no_todos": "No to-dos"
+  "no_todos": "No to-dos",
+  "add_todo": {
+    "todo": "To-do",
+    "course": "Course",
+    "confirm": "Confirm",
+    "date_format": "{{month}}/{{day}}/{{year}}"
+  }
 }
 
