@@ -22,7 +22,25 @@
     "todo": "待办",
     "course": "课程",
     "confirm": "确定",
-    "date_format": "{{year}} 年 {{month}} 月 {{day}} 日"
+    "date_format": "{{year}} 年 {{month}} 月 {{day}} 日",
+    "todo_form": {
+      "title": "标题",
+      "title_placeholder": "输入待办事项标题",
+      "subtitle": "备注",
+      "subtitle_placeholder": "添加备注信息（可选）",
+      "due_time": "截止时间",
+      "due_time_placeholder": "设置截止时间（可选）"
+    },
+    "course_form": {
+      "name": "课程名称",
+      "name_placeholder": "输入课程名称",
+      "location": "教室",
+      "location_placeholder": "输入教室位置",
+      "start_time": "开始时间",
+      "start_time_placeholder": "如：08:00",
+      "end_time": "结束时间",
+      "end_time_placeholder": "如：09:40"
+    }
   }
 }
 

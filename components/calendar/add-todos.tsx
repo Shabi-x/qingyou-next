@@ -2,21 +2,33 @@ import { useI18n } from '@/hooks/use-i18n';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useDraggableButton } from '@/utils/use-draggable-button';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeOut, SlideInDown, SlideInLeft, SlideInRight, SlideOutDown, SlideOutLeft, SlideOutRight, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 interface AddTodosButtonProps {
   onAdd?: (type: 'todo' | 'course', date: Date) => void;
   style?: ViewStyle;
-  selectedDate?: Date; // 选中的日期，与日历联动
+  selectedDate?: Date; // 选中的日期
 }
 
 export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonProps) {
   const { t } = useI18n('calendar');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'todo' | 'course'>('todo');
+  const previousType = useRef<'todo' | 'course'>('todo');
+  
+  // 待办表单状态
+  const [todoTitle, setTodoTitle] = useState('');
+  const [todoSubtitle, setTodoSubtitle] = useState('');
+  const [todoDueTime, setTodoDueTime] = useState('');
+  
+  // 课程表单状态
+  const [courseName, setCourseName] = useState('');
+  const [courseLocation, setCourseLocation] = useState('');
+  const [courseStartTime, setCourseStartTime] = useState('');
+  const [courseEndTime, setCourseEndTime] = useState('');
   
   // 使用传入的日期，如果没有则使用当前日期
   const currentDate = selectedDate || new Date();
@@ -26,6 +38,28 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const cardBackgroundColor = useThemeColor({}, 'card');
   const backgroundColor = useThemeColor({}, 'background');
+  const borderColor = useThemeColor({ light: '#E8E8ED', dark: '#333' }, 'cardBorder');
+  const switchBgColor = useThemeColor({ light: '#F5F5F7', dark: '#1C1C1E' }, 'backgroundSecondary');
+
+  // 白色滑块动画
+  const slidePosition = useSharedValue(selectedType === 'todo' ? 0 : 1);
+
+  useEffect(() => {
+    slidePosition.value = withTiming(selectedType === 'todo' ? 0 : 1, {
+      duration: 200,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selectedType, slidePosition]);
+
+  const slideAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: slidePosition.value * 34,
+        },
+      ],
+    };
+  });
 
   const handleOpenModal = () => {
     setIsModalVisible(true);
@@ -38,6 +72,18 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
+    // 清空表单
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setTodoTitle('');
+    setTodoSubtitle('');
+    setTodoDueTime('');
+    setCourseName('');
+    setCourseLocation('');
+    setCourseStartTime('');
+    setCourseEndTime('');
   };
 
   const handleConfirm = () => {
@@ -52,6 +98,28 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
       month: currentDate.getMonth() + 1,
       day: currentDate.getDate(),
     });
+  };
+
+  const handleTypeChange = (type: 'todo' | 'course') => {
+    previousType.current = selectedType;
+    setSelectedType(type);
+  };
+
+  // 根据切换方向决定动画
+  const getEnteringAnimation = () => {
+    if (selectedType === 'course') {
+      return SlideInLeft.duration(200);
+    } else {
+      return SlideInRight.duration(200);
+    }
+  };
+
+  const getExitingAnimation = () => {
+    if (previousType.current === 'todo' && selectedType === 'course') {
+      return SlideOutLeft.duration(200);
+    } else {
+      return SlideOutRight.duration(200);
+    }
   };
 
   return (
@@ -115,73 +183,256 @@ export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonPro
             </TouchableOpacity>
           </View>
 
-          {/* 选项卡 */}
-          <View style={styles.tabs}>
-            <TouchableOpacity
-              style={[
-                styles.tab,
-                selectedType === 'todo' && [styles.tabActive, { backgroundColor }],
-              ]}
-              onPress={() => setSelectedType('todo')}
+          {/* 内容区域 */}
+          <View style={styles.content}>
+            {selectedType === 'todo' ? (
+              // 待办表单
+              <Animated.ScrollView
+                key="todo-form"
+                entering={getEnteringAnimation()}
+                exiting={getExitingAnimation()}
+                style={styles.scrollView}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.formContainer}>
+                {/* 标题 */}
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.label, { color: textColor }]}>
+                    {t('add_todo.todo_form.title')}
+                  </Text>
+                  <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+                    <MaterialIcons
+                      name="title"
+                      size={22}
+                      color={textSecondaryColor}
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={[styles.input, { color: textColor }]}
+                      placeholder={t('add_todo.todo_form.title_placeholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      value={todoTitle}
+                      onChangeText={setTodoTitle}
+                    />
+                  </View>
+                </View>
+
+                {/* 备注 */}
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.label, { color: textColor }]}>
+                    {t('add_todo.todo_form.subtitle')}
+                  </Text>
+                  <View style={[styles.inputWrapper, styles.textAreaWrapper, { backgroundColor, borderColor }]}>
+                    <MaterialIcons
+                      name="notes"
+                      size={22}
+                      color={textSecondaryColor}
+                      style={[styles.inputIcon, styles.textAreaIcon]}
+                    />
+                    <TextInput
+                      style={[styles.input, styles.textArea, { color: textColor }]}
+                      placeholder={t('add_todo.todo_form.subtitle_placeholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      value={todoSubtitle}
+                      onChangeText={setTodoSubtitle}
+                      multiline
+                      numberOfLines={3}
+                      textAlignVertical="top"
+                    />
+                  </View>
+                </View>
+
+                {/* 截止时间 */}
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.label, { color: textColor }]}>
+                    {t('add_todo.todo_form.due_time')}
+                  </Text>
+                  <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+                    <MaterialIcons
+                      name="access-time"
+                      size={22}
+                      color={textSecondaryColor}
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={[styles.input, { color: textColor }]}
+                      placeholder={t('add_todo.todo_form.due_time_placeholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      value={todoDueTime}
+                      onChangeText={setTodoDueTime}
+                    />
+                  </View>
+                </View>
+              </View>
+              </Animated.ScrollView>
+            ) : (
+              // 课程表单
+              <Animated.ScrollView
+                key="course-form"
+                entering={getEnteringAnimation()}
+                exiting={getExitingAnimation()}
+                style={styles.scrollView}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.formContainer}>
+                {/* 课程名称 */}
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.label, { color: textColor }]}>
+                    {t('add_todo.course_form.name')}
+                  </Text>
+                  <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+                    <MaterialIcons
+                      name="school"
+                      size={22}
+                      color={textSecondaryColor}
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={[styles.input, { color: textColor }]}
+                      placeholder={t('add_todo.course_form.name_placeholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      value={courseName}
+                      onChangeText={setCourseName}
+                    />
+                  </View>
+                </View>
+
+                {/* 教室 */}
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.label, { color: textColor }]}>
+                    {t('add_todo.course_form.location')}
+                  </Text>
+                  <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+                    <MaterialIcons
+                      name="location-on"
+                      size={22}
+                      color={textSecondaryColor}
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={[styles.input, { color: textColor }]}
+                      placeholder={t('add_todo.course_form.location_placeholder')}
+                      placeholderTextColor={textSecondaryColor}
+                      value={courseLocation}
+                      onChangeText={setCourseLocation}
+                    />
+                  </View>
+                </View>
+
+                {/* 时间段 */}
+                <View style={styles.timeRow}>
+                  <View style={[styles.inputGroup, styles.timeInputGroup]}>
+                    <Text style={[styles.label, { color: textColor }]}>
+                      {t('add_todo.course_form.start_time')}
+                    </Text>
+                    <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+                      <MaterialIcons
+                        name="schedule"
+                        size={22}
+                        color={textSecondaryColor}
+                        style={styles.inputIcon}
+                      />
+                      <TextInput
+                        style={[styles.input, { color: textColor }]}
+                        placeholder={t('add_todo.course_form.start_time_placeholder')}
+                        placeholderTextColor={textSecondaryColor}
+                        value={courseStartTime}
+                        onChangeText={setCourseStartTime}
+                        keyboardType="numbers-and-punctuation"
+                      />
+                    </View>
+                  </View>
+
+                  <View style={[styles.inputGroup, styles.timeInputGroup]}>
+                    <Text style={[styles.label, { color: textColor }]}>
+                      {t('add_todo.course_form.end_time')}
+                    </Text>
+                    <View style={[styles.inputWrapper, { backgroundColor, borderColor }]}>
+              <MaterialIcons
+                        name="schedule"
+                        size={22}
+                        color={textSecondaryColor}
+                        style={styles.inputIcon}
+                      />
+                      <TextInput
+                        style={[styles.input, { color: textColor }]}
+                        placeholder={t('add_todo.course_form.end_time_placeholder')}
+                        placeholderTextColor={textSecondaryColor}
+                        value={courseEndTime}
+                        onChangeText={setCourseEndTime}
+                        keyboardType="numbers-and-punctuation"
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              </Animated.ScrollView>
+            )}
+          </View>
+
+          {/* 底部：选项卡 + 确定按钮 */}
+          <View style={styles.bottomBar}>
+            <TouchableOpacity 
+              style={[styles.switchContainer, { backgroundColor: switchBgColor }]}
+              onPress={() => handleTypeChange(selectedType === 'todo' ? 'course' : 'todo')}
               activeOpacity={0.7}
             >
+              <Animated.View
+                style={[
+                  styles.switchSlider,
+                  { backgroundColor: cardBackgroundColor },
+                  slideAnimatedStyle,
+                ]}
+              />
+
               <MaterialIcons
                 name="check-circle-outline"
-                size={24}
+                size={22}
                 color={selectedType === 'todo' ? textColor : textSecondaryColor}
+                style={styles.iconLeft}
               />
-              <Text
-                style={[
-                  styles.tabText,
-                  {
-                    color: selectedType === 'todo' ? textColor : textSecondaryColor,
-                  },
-                ]}
-              >
-                {t('add_todo.todo')}
-              </Text>
+
+              <View style={styles.switchTextContainer}>
+                {selectedType === 'todo' ? (
+                  <Animated.Text
+                    key="todo-text"
+                    entering={FadeIn.duration(200)}
+                    exiting={FadeOut.duration(200)}
+                    style={[styles.switchText, { color: textColor }]}
+                  >
+                    {t('add_todo.todo')}
+                  </Animated.Text>
+                ) : (
+                  <Animated.Text
+                    key="course-text"
+                    entering={FadeIn.duration(200)}
+                    exiting={FadeOut.duration(200)}
+                    style={[styles.switchText, { color: textColor }]}
+                  >
+                    {t('add_todo.course')}
+                  </Animated.Text>
+                )}
+              </View>
+
+              <MaterialIcons
+                name="school"
+                size={22}
+                color={selectedType === 'course' ? textColor : textSecondaryColor}
+                style={styles.iconRight}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.tab,
-                selectedType === 'course' && [styles.tabActive, { backgroundColor }],
-              ]}
-              onPress={() => setSelectedType('course')}
-              activeOpacity={0.7}
+              style={[styles.confirmButton, { backgroundColor: accentColor }]}
+              onPress={handleConfirm}
+              activeOpacity={0.85}
             >
-              <MaterialIcons
-                name="school"
-                size={24}
-                color={selectedType === 'course' ? textColor : textSecondaryColor}
-              />
-              <Text
-                style={[
-                  styles.tabText,
-                  {
-                    color: selectedType === 'course' ? textColor : textSecondaryColor,
-                  },
-                ]}
-              >
-                {t('add_todo.course')}
-              </Text>
+              <Text style={styles.confirmButtonText}>{t('add_todo.confirm')}</Text>
+              <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
-
-          {/* 内容区域（待实现） */}
-          <View style={styles.content}>
-            {/* 这里后续填充表单内容 */}
-          </View>
-
-          {/* 底部确定按钮 */}
-          <TouchableOpacity
-            style={[styles.confirmButton, { backgroundColor: accentColor }]}
-            onPress={handleConfirm}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.confirmButtonText}>{t('add_todo.confirm')}</Text>
-            <MaterialIcons name="arrow-forward" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
         </Animated.View>
       </Modal>
     </>
@@ -214,7 +465,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: '65%',
+    height: '55%',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 24,
@@ -247,50 +498,126 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // 选项卡
-  tabs: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+  content: {
+    flex: 1,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
-  tab: {
+  scrollView: {
+    flex: 1,
+  },
+  formContainer: {
+    paddingBottom: 16,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    height: 54,
     borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 16,
   },
-  tabActive: {
+  textAreaWrapper: {
+    height: 100,
+    alignItems: 'flex-start',
+    paddingVertical: 14,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  textAreaIcon: {
+    marginTop: 2,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0,
+  },
+  textArea: {
+    paddingVertical: 0,
+    minHeight: 70,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  timeInputGroup: {
+    flex: 1,
+  },
+
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 'auto',
+  },
+
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 112,
+    height: 44,
+    borderRadius: 22,
+    padding: 4,
+    position: 'relative',
+    gap: 4,
+  },
+  switchSlider: {
+    position: 'absolute',
+    left: 4,
+    top: 4,
+    width: 70,
+    height: 36,
+    borderRadius: 18,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
-  tabText: {
-    fontSize: 15,
+  iconLeft: {
+    zIndex: 2,
+    paddingLeft: 6,
+  },
+  iconRight: {
+    zIndex: 2,
+    paddingRight: 6,
+  },
+  switchTextContainer: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  switchText: {
+    fontSize: 14,
     fontWeight: '600',
+    letterSpacing: -0.3,
   },
 
-  // 内容区域
-  content: {
-    flex: 1,
-  },
-
-  // 确定按钮
   confirmButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    height: 56,
-    borderRadius: 16,
-    marginTop: 'auto',
+    gap: 6,
+    width: 114,
+    height: 44,
+    borderRadius: 22,
   },
   confirmButtonText: {
     color: '#FFFFFF',
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '600',
     letterSpacing: -0.2,
   },
