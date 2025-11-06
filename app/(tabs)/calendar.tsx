@@ -207,6 +207,7 @@ export default function CalendarScreen() {
 
       {/* 添加待办按钮（可拖动，自动贴边） */}
       <AddTodosButton 
+        selectedDate={selectedDate || new Date()}
         style={{
           position: 'absolute',
           bottom: 130,

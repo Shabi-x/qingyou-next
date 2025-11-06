@@ -10,13 +10,16 @@ import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-nati
 interface AddTodosButtonProps {
   onAdd?: (type: 'todo' | 'course', date: Date) => void;
   style?: ViewStyle;
+  selectedDate?: Date; // 选中的日期，与日历联动
 }
 
-export function AddTodosButton({ onAdd, style }: AddTodosButtonProps) {
+export function AddTodosButton({ onAdd, style, selectedDate }: AddTodosButtonProps) {
   const { t } = useI18n('calendar');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState<'todo' | 'course'>('todo');
-  const [selectedDate] = useState(new Date()); // 暂未实现日期选择功能
+  
+  // 使用传入的日期，如果没有则使用当前日期
+  const currentDate = selectedDate || new Date();
   
   const accentColor = useThemeColor({}, 'accent');
   const textColor = useThemeColor({}, 'text');
@@ -39,15 +42,15 @@ export function AddTodosButton({ onAdd, style }: AddTodosButtonProps) {
 
   const handleConfirm = () => {
     // 暂时不实现功能，只关闭模态框
-    onAdd?.(selectedType, selectedDate);
+    onAdd?.(selectedType, currentDate);
     handleCloseModal();
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = () => {
     return t('add_todo.date_format', {
-      year: date.getFullYear(),
-      month: date.getMonth() + 1,
-      day: date.getDate(),
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth() + 1,
+      day: currentDate.getDate(),
     });
   };
 
@@ -97,7 +100,7 @@ export function AddTodosButton({ onAdd, style }: AddTodosButtonProps) {
             {/* 日期选择器 */}
             <TouchableOpacity style={styles.dateSelector} activeOpacity={0.7}>
               <Text style={[styles.dateText, { color: textColor }]}>
-                {formatDate(selectedDate)}
+                {formatDate()}
               </Text>
               <MaterialIcons name="chevron-right" size={24} color={accentColor} />
             </TouchableOpacity>
@@ -186,7 +189,6 @@ export function AddTodosButton({ onAdd, style }: AddTodosButtonProps) {
 }
 
 const styles = StyleSheet.create({
-  // 圆形按钮（不带定位）
   button: {
     width: 56,
     height: 56,
