@@ -7,11 +7,13 @@ import authZh from './zh-CN/auth.json';
 import calendarZh from './zh-CN/calendar.json';
 import commonZh from './zh-CN/common.json';
 import mineZh from './zh-CN/mine.json';
+import pomodoroZh from './zh-CN/pomodoro.json';
 
 import authEn from './en-US/auth.json';
 import calendarEn from './en-US/calendar.json';
 import commonEn from './en-US/common.json';
 import mineEn from './en-US/mine.json';
+import pomodoroEn from './en-US/pomodoro.json';
 
 // 支持的语言列表
 export const supportedLanguages = {
@@ -28,12 +30,14 @@ const resources = {
     common: commonZh,
     calendar: calendarZh,
     mine: mineZh,
+    pomodoro: pomodoroZh,
   },
   'en-US': {
     auth: authEn,
     common: commonEn,
     calendar: calendarEn,
     mine: mineEn,
+    pomodoro: pomodoroEn,
   },
 };
 

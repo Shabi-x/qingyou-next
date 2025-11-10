@@ -1,7 +1,3 @@
-/**
- * 番茄钟容器组件 - 管理设置页和专注页的导航
- */
-
 import { PomodoroConfig } from '@/types/pomodoro';
 import React from 'react';
 import { PomodoroFocus } from './pomodoro-focus';
@@ -14,21 +10,18 @@ export function PomodoroContainer() {
   const [config, setConfig] = React.useState<PomodoroConfig | null>(null);
   const [focusKey, setFocusKey] = React.useState(0);
   
-  // 开始专注
   const handleStart = (newConfig: PomodoroConfig) => {
     setConfig(newConfig);
     setViewState('focus');
   };
   
-  // 取消/完成/放弃 - 返回设置页
   const handleBack = () => {
     setViewState('setup');
     setConfig(null);
   };
   
-  // 重新开始 - 使用相同配置重新开始
   const handleRestart = () => {
-    setFocusKey(prev => prev + 1); // 强制重新渲染
+    setFocusKey(prev => prev + 1);
   };
   
   if (viewState === 'setup') {
@@ -50,3 +43,5 @@ export function PomodoroContainer() {
   
   return null;
 }
+
+

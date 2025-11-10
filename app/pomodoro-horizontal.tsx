@@ -4,7 +4,6 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default function PomodoroHorizontal() {
   const textColor = useThemeColor({}, 'text');
-  const textSecondary = useThemeColor({}, 'textSecondary');
   const background = useThemeColor({}, 'background');
 
   return (
