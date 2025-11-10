@@ -5,7 +5,9 @@
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { PomodoroConfig, TimerMode } from '@/types/pomodoro';
 import { angleToMinutes, minutesToAngle, POMODORO_CONFIG } from '@/utils/pomodoro';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -84,7 +86,7 @@ export function PomodoroSetup({ onStart }: PomodoroSetupProps) {
         ]}
       >
         <TouchableOpacity onPress={() => setShowDetail(true)} activeOpacity={0.8} style={styles.iconButton}>
-          <ChartPieIcon size={28} color={textColor} />
+          <ChartPieIcon size={24} color={textColor} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           {/* 模式选择（开关） */}
@@ -126,8 +128,14 @@ export function PomodoroSetup({ onStart }: PomodoroSetupProps) {
             />
           </TouchableOpacity>
         </View>
-        {/* 占位使居中真实居中 */}
-        <View style={styles.iconPlaceholder} />
+        {/* 右侧：横屏入口 */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          activeOpacity={0.8}
+          onPress={() => router.push('/pomodoro-horizontal')}
+        >
+          <MaterialCommunityIcons name="phone-rotate-landscape" size={24} color={textColor} />
+        </TouchableOpacity>
       </View>
       
       {/* 内容区域 */}
