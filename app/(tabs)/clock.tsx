@@ -1,15 +1,11 @@
-import { ThemedText, ThemedView } from '@/components/common';
+import { PomodoroContainer } from '@/components/clock';
+import { ThemedView } from '@/components/common';
 import { StyleSheet } from 'react-native';
 
 export default function ClockScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedView style={styles.content}>
-        <ThemedText type="title">时钟</ThemedText>
-        <ThemedText style={styles.description}>
-          Hello World - 时钟页面
-        </ThemedText>
-      </ThemedView>
+      <PomodoroContainer />
     </ThemedView>
   );
 }
@@ -17,15 +13,6 @@ export default function ClockScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
-  },
-  content: {
-    padding: 20,
-    gap: 16,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
   },
 });
 
