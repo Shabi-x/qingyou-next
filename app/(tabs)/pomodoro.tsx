@@ -1,8 +1,8 @@
-import { PomodoroContainer } from '@/components/clock';
+import { PomodoroContainer } from '@/components/pomodoro';
 import { ThemedView } from '@/components/common';
 import { StyleSheet } from 'react-native';
 
-export default function ClockScreen() {
+export default function PomodoroScreen() {
   return (
     <ThemedView style={styles.container}>
       <PomodoroContainer />
@@ -15,4 +15,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
 

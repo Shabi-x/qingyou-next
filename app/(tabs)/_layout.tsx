@@ -67,7 +67,7 @@ function SlidingBackground() {
   const getTabIndex = (path: string) => {
     if (path.includes('calendar')) return 0;
     if (path.includes('schedule')) return 1;
-    if (path.includes('clock')) return 2;
+    if (path.includes('pomodoro')) return 2;
     if (path.includes('mine')) return 3;
     return 0;
   };
@@ -182,9 +182,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="clock"
+        name="pomodoro"
         options={{
-          title: '时钟',
+          title: '专注',
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} iconName="alarm.fill" />
           ),

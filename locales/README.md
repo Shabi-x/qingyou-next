@@ -12,13 +12,13 @@ locales/
 │   ├── common.json       # 通用翻译
 │   ├── calendar.json     # 日历模块
 │   ├── schedule.json     # 课程表模块
-│   ├── clock.json        # 时钟模块
+│   ├── pomorodo.json        # 时钟模块
 │   └── mine.json         # 我的模块
 └── en-US/                # 英文翻译
     ├── common.json
     ├── calendar.json
     ├── schedule.json
-    ├── clock.json
+    ├── pomorodo.json
     └── mine.json
 ```
 
@@ -220,7 +220,7 @@ const resources = {
 
 ```typescript
 export function useI18n(
-  namespace?: 'common' | 'calendar' | 'schedule' | 'clock' | 'mine' | 'settings'  // ← 添加
+  namespace?: 'common' | 'calendar' | 'schedule' | 'pomorodo' | 'mine' | 'settings'  // ← 添加
 ) {
   // ...
 }
