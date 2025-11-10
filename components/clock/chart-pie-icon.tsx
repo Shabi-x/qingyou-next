@@ -1,0 +1,25 @@
+import React from 'react';
+import Svg, { Path } from 'react-native-svg';
+
+interface ChartPieIconProps {
+  size?: number;
+  color?: string;
+}
+
+export function ChartPieIcon({ size = 22, color = '#000' }: ChartPieIconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M21.21 15.89C20.5739 17.3945 19.5788 18.7202 18.3119 19.7513C17.045 20.7824 15.5448 21.4874 13.9425 21.8048C12.3401 22.1221 10.6845 22.0421 9.12018 21.5718C7.55591 21.1014 6.13066 20.2551 4.96906 19.1067C3.80745 17.9582 2.94485 16.5428 2.45667 14.9839C1.96849 13.4251 1.8696 11.7705 2.16863 10.1646C2.46767 8.55878 3.15553 7.05063 4.17208 5.77203C5.18863 4.49343 6.50292 3.48332 8.00004 2.83M21 12C21.552 12 22.005 11.551 21.95 11.002C21.7195 8.70617 20.7021 6.5607 19.0704 4.92932C17.4386 3.29794 15.2929 2.28104 12.997 2.051C12.447 1.996 11.999 2.449 11.999 3.001V11.001C11.999 11.2662 12.1044 11.5206 12.2919 11.7081C12.4795 11.8956 12.7338 12.001 12.999 12.001L21 12Z"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export default ChartPieIcon;
+
+

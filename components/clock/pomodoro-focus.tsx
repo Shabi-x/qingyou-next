@@ -218,10 +218,6 @@ export function PomodoroFocus({
             >
               <Text style={styles.buttonText}>取消（{cancelCountdown}s）</Text>
             </Pressable>
-            
-            <Text style={[styles.cancelHintText, { color: textSecondaryColor }]}>
-              {cancelCountdown} 秒之内可以取消任务
-            </Text>
           </>
         )}
         
