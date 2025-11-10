@@ -41,8 +41,10 @@ export function PomodoroSetup({ onStart }: PomodoroSetupProps) {
   
   return (
     <View style={styles.container}>
-      {/* 模式选择 */}
-      <View style={styles.modeSelector}>
+      {/* 内容区域 */}
+      <View style={styles.content}>
+        {/* 模式选择 */}
+        <View style={styles.modeSelector}>
         <Pressable
           style={[
             styles.modeButton,
@@ -133,14 +135,17 @@ export function PomodoroSetup({ onStart }: PomodoroSetupProps) {
           </Text>
         </>
       )}
+      </View>
       
-      {/* 开始按钮 */}
-      <Pressable
-        style={[styles.startButton, { backgroundColor: accentColor }]}
-        onPress={handleStart}
-      >
-        <Text style={styles.startButtonText}>开始专注</Text>
-      </Pressable>
+      {/* 按钮区域 */}
+      <View style={styles.buttonArea}>
+        <Pressable
+          style={[styles.startButton, { backgroundColor: accentColor }]}
+          onPress={handleStart}
+        >
+          <Text style={styles.startButtonText}>开始专注</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -148,9 +153,17 @@ export function PomodoroSetup({ onStart }: PomodoroSetupProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 40,
+  },
+  buttonArea: {
+    paddingHorizontal: 32,
+    paddingBottom: 148,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
@@ -198,15 +211,17 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   startButton: {
-    paddingHorizontal: 64,
+    paddingHorizontal: 32,
     paddingVertical: 18,
-    borderRadius: 28,
-    minWidth: 200,
+    borderRadius: 20,
+    minWidth: 240,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   startButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+    textAlign: 'center',
   },
 });

@@ -3,7 +3,7 @@
  */
 
 /** 计时模式 */
-export type TimerMode = 'countdown' | 'countup';
+export type TimerMode = 'countdown' | 'countup';  // 倒计时 | 正计时
 
 /** 专注状态 */
 export type FocusState = 
@@ -11,7 +11,8 @@ export type FocusState =
   | 'canceling'   // 可取消阶段（前10秒）
   | 'focusing'    // 专注中
   | 'paused'      // 暂停
-  | 'completed';  // 已完成
+  | 'completed'   // 已完成（正常完成）
+  | 'abandoned';  // 半途而废（放弃/提前结束）
 
 /** 番茄钟配置 */
 export interface PomodoroConfig {

@@ -2,6 +2,7 @@
  * 番茄钟专注页面
  */
 
+import { CANCEL_COUNTDOWN_SECONDS } from '@/constants/pomodoro';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { FocusState, PomodoroConfig } from '@/types/pomodoro';
 import { formatTime } from '@/utils/pomodoro';
@@ -16,6 +17,7 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { InspiringSlogan } from './inspiring-slogan';
 
 interface PomodoroFocusProps {
   config: PomodoroConfig;
@@ -35,13 +37,11 @@ export function PomodoroFocus({
   const textColor = useThemeColor({}, 'text');
   const textSecondaryColor = useThemeColor({}, 'textSecondary');
   const accentColor = useThemeColor({}, 'accent');
-  const dangerColor = '#FF6B6B';
   
   const [focusState, setFocusState] = React.useState<FocusState>('canceling');
   const [elapsedSeconds, setElapsedSeconds] = React.useState(0);
-  const [cancelCountdown, setCancelCountdown] = React.useState(10);
+  const [cancelCountdown, setCancelCountdown] = React.useState(CANCEL_COUNTDOWN_SECONDS);
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
-  const [isGivenUp, setIsGivenUp] = React.useState(false);
   
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const slideProgress = useSharedValue(0);
@@ -131,7 +131,7 @@ export function PomodoroFocus({
   // 确认结束
   const confirmEnd = () => {
     setShowConfirmDialog(false);
-    setFocusState('completed');
+    setFocusState('abandoned');
   };
   
   // 更新动画值
@@ -153,8 +153,7 @@ export function PomodoroFocus({
   
   // 处理放弃
   const handleGiveUp = () => {
-    setIsGivenUp(true);
-    setFocusState('completed');
+    setFocusState('abandoned');
   };
   
   // 左滑手势（倒计时模式放弃）
@@ -192,8 +191,10 @@ export function PomodoroFocus({
   
   return (
     <View style={styles.container}>
-      {/* 装饰图片区域 */}
-      <View style={styles.imageContainer}>
+      {/* 内容区域 */}
+      <View style={styles.content}>
+        {/* 装饰图片区域 */}
+        <View style={styles.imageContainer}>
         <Text style={styles.imagePlaceholder}>🐱</Text>
       </View>
       
@@ -202,21 +203,12 @@ export function PomodoroFocus({
         {formatTime(displaySeconds)}
       </Text>
       
-      {/* 提示文字 */}
-      {(focusState === 'canceling' || (config.mode === 'countdown' && focusState === 'focusing')) && (
-        <Text style={[styles.hintText, { color: textSecondaryColor }]}>
-          正在专注中，请不要分心哦～
-        </Text>
-      )}
-      
-      {focusState === 'completed' && (
-        <Text style={[styles.hintText, { color: isGivenUp ? dangerColor : accentColor }]}>
-          {isGivenUp ? '快回去继续努力吧～离目标更近一步！' : '太棒了！完成专注～'}
-        </Text>
-      )}
+      {/* 激励标语 */}
+      <InspiringSlogan focusState={focusState} mode={config.mode} />
+      </View>
       
       {/* 按钮区域 */}
-      <View style={styles.buttonContainer}>
+      <View style={styles.buttonArea}>
         {/* 取消按钮（前10秒） */}
         {focusState === 'canceling' && (
           <>
@@ -240,7 +232,7 @@ export function PomodoroFocus({
               style={[
                 styles.slideButton,
                 {
-                  backgroundColor: dangerColor,
+                  backgroundColor: accentColor,
                   transform: [{ translateX: slideInterpolate }],
                   opacity: slideOpacity,
                 },
@@ -263,37 +255,34 @@ export function PomodoroFocus({
         )}
         
         {config.mode === 'countup' && focusState === 'paused' && (
-          
           <View style={styles.pausedButtons}>
             <Pressable
-              style={[styles.button, { backgroundColor: textSecondaryColor }]}
+              style={[styles.button, styles.shortButton, { backgroundColor: textSecondaryColor }]}
               onPress={handleEnd}
             >
               <Text style={styles.buttonText}>结束</Text>
             </Pressable>
             <Pressable
-              style={[styles.button, { backgroundColor: accentColor }]}
+              style={[styles.button, styles.longButton, { backgroundColor: accentColor }]}
               onPress={handlePauseResume}
             >
               <Text style={styles.buttonText}>继续</Text>
             </Pressable>
-  
-
           </View>
         )}
         
-        {/* 完成状态：返回和重新开始按钮 */}
-        {focusState === 'completed' && (
+        {/* 完成/放弃状态：返回和重新开始按钮 */}
+        {(focusState === 'completed' || focusState === 'abandoned') && (
           <View style={styles.pausedButtons}>
             <Pressable
-              style={[styles.button, { backgroundColor: textSecondaryColor }]}
+              style={[styles.button, styles.shortButton, { backgroundColor: textSecondaryColor }]}
               onPress={onComplete}
             >
               <Text style={styles.buttonText}>返回</Text>
             </Pressable>
             
             <Pressable
-              style={[styles.button, { backgroundColor: accentColor }]}
+              style={[styles.button, styles.longButton, { backgroundColor: accentColor }]}
               onPress={onRestart}
             >
               <Text style={styles.buttonText}>重新开始</Text>
@@ -348,9 +337,17 @@ export function PomodoroFocus({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 40,
+  },
+  buttonArea: {
+    paddingHorizontal: 32,
+    paddingBottom: 148,
+    alignItems: 'center',
   },
   imageContainer: {
     width: 200,
@@ -388,14 +385,23 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingHorizontal: 32,
   },
   button: {
-    paddingHorizontal: 48,
+    paddingHorizontal: 32,
     paddingVertical: 18,
-    borderRadius: 28,
-    minWidth: 160,
+    borderRadius: 20,
+    minWidth: 240,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shortButton: {
+    minWidth: 60,
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  longButton: {
+    flex: 2.5,
+    paddingHorizontal: 24,
   },
   cancelButton: {
     width: 180,
@@ -410,11 +416,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     fontVariant: ['tabular-nums'],
+    textAlign: 'center',
   },
   slideButton: {
     width: '100%',
     paddingVertical: 18,
-    borderRadius: 28,
+    borderRadius: 20,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -422,7 +429,7 @@ const styles = StyleSheet.create({
   },
   slideButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   slideIcon: {

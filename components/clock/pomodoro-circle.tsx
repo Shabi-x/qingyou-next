@@ -147,10 +147,9 @@ export function PomodoroCircle({
             cx={center}
             cy={center}
             r={radius}
-            stroke="#E8E8ED"
+            stroke="#DAE2B9"
             strokeWidth={strokeWidth}
             fill="none"
-            opacity={0.3}
           />
           
           {/* 进度圆弧 */}
