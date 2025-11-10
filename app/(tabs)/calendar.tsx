@@ -13,7 +13,6 @@ export default function CalendarScreen() {
   const [displayMonth, setDisplayMonth] = useState(new Date().getMonth());
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  // Todos 完成状态（临时存储）
   const [todosState, setTodosState] = useState<Record<string, boolean>>({});
   
   // 课程详情面板状态
