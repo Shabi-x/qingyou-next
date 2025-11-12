@@ -2,6 +2,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+// 青柚时钟全屏模式-横屏
 export default function PomodoroHorizontal() {
   const textColor = useThemeColor({}, 'text');
   const background = useThemeColor({}, 'background');

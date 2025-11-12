@@ -14,9 +14,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { InspiringSlogan } from './inspiring-slogan';
+import { SlideToCancelButton } from './slide-to-cancel-button';
 
 interface PomodoroFocusProps {
   config: PomodoroConfig;
@@ -43,8 +42,6 @@ export function PomodoroFocus({
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const slideProgress = useSharedValue(0);
-  const slideAnimation = React.useRef(new Animated.Value(0)).current;
   
   const remainingSeconds = config.mode === 'countdown'
     ? config.minutes * 60 - elapsedSeconds
@@ -124,52 +121,9 @@ export function PomodoroFocus({
     setFocusState('abandoned');
   };
   
-  const updateAnimation = React.useCallback((progress: number) => {
-    Animated.timing(slideAnimation, {
-      toValue: progress,
-      duration: 0,
-      useNativeDriver: false,
-    }).start();
-  }, [slideAnimation]);
-  
-  const springBack = React.useCallback(() => {
-    Animated.spring(slideAnimation, {
-      toValue: 0,
-      useNativeDriver: false,
-    }).start();
-  }, [slideAnimation]);
-  
   const handleGiveUp = () => {
     setFocusState('abandoned');
   };
-  
-  const panGesture = Gesture.Pan()
-    .enabled(config.mode === 'countdown' && focusState === 'focusing')
-    .onUpdate((event) => {
-      'worklet';
-      const progress = Math.max(0, Math.min(1, -event.translationX / 300));
-      slideProgress.value = progress;
-      runOnJS(updateAnimation)(progress);
-    })
-    .onEnd(() => {
-      'worklet';
-      if (slideProgress.value >= 0.8) {
-        runOnJS(handleGiveUp)();
-      } else {
-        runOnJS(springBack)();
-        slideProgress.value = 0;
-      }
-    });
-  
-  const slideInterpolate = slideAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -300],
-  });
-  
-  const slideOpacity = slideAnimation.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.6, 1],
-  });
   
   return (
     <View style={styles.container}>
@@ -196,21 +150,13 @@ export function PomodoroFocus({
         )}
         
         {config.mode === 'countdown' && focusState === 'focusing' && (
-          <GestureDetector gesture={panGesture}>
-            <Animated.View
-              style={[
-                styles.slideButton,
-                {
-                  backgroundColor: accentColor,
-                  transform: [{ translateX: slideInterpolate }],
-                  opacity: slideOpacity,
-                },
-              ]}
-            >
-              <Text style={styles.slideButtonText}>向右滑动放弃专注</Text>
-              <Text style={styles.slideIcon}>🐟</Text>
-            </Animated.View>
-          </GestureDetector>
+          <SlideToCancelButton
+            onCancel={handleGiveUp}
+            cancelThreshold={1}
+            colorThreshold={0.5}
+            baseColor="#666666"
+            dangerColor="#FF4444"
+          />
         )}
         
         {config.mode === 'countup' && focusState === 'focusing' && (
@@ -357,17 +303,6 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     textAlign: 'center',
   },
-  slideButton: {
-    width: '100%',
-    paddingVertical: 18,
-    borderRadius: 20,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  slideButtonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
-  slideIcon: { fontSize: 24 },
   pausedButtons: { flexDirection: 'row', gap: 16 },
   modalOverlay: {
     flex: 1,
