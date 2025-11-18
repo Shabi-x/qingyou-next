@@ -15,7 +15,7 @@ export default function MineScreen() {
   
   // Mock 用户数据
   const userData = {
-    name: '梁少峻',
+    name: '梁少峻12138',
     studentId: 'B22042219',
     department: '计算机学院、软件学院、网络空间安全学院',
     major: '软件工程',

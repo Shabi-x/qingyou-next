@@ -19,16 +19,14 @@
       "package": "com.shabix.qingyounext",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/avatar.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/avatar.png"
     },
     "plugins": [
       "expo-router",
@@ -55,6 +53,12 @@
         "projectId": "bb9a2d63-2bd0-49eb-b915-8694fb30dbc4"
       }
     },
-    "owner": "shabix"
+    "owner": "shabix",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bb9a2d63-2bd0-49eb-b915-8694fb30dbc4"
+    }
   }
 }
