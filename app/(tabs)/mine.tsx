@@ -15,10 +15,10 @@ export default function MineScreen() {
   
   // Mock 用户数据
   const userData = {
-    name: '梁少峻12138',
+    name: '钟泽安12138-666',
     studentId: 'B22042219',
-    department: '计算机学院、软件学院、网络空间安全学院',
-    major: '软件工程',
+    department: '钟泽安学院、软件学院、网络空间安全学院',
+    major: 'zza工程',
   };
 
   const handleLogout = () => {
